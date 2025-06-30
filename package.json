@@ -16,7 +16,8 @@
   "scripts": {
     "test:integration": "mocha --forbid-only \"test/integration/**/*.test.ts\"",
     "build": "tsc",
-    "oclif": "oclif"
+    "oclif": "oclif",
+    "set-hooks": "npx simple-git-hooks"
   },
   "bin": {
     "unmold": "./bin/run.js"
