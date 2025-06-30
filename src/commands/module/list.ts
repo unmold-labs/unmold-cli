@@ -42,7 +42,7 @@ export default class ModuleList extends Command {
       // Output the result as JSON
       this.log(JSON.stringify(modules, null, 2));
     } catch (error) {
-      this.error(`Failed to list module versions: ${error.message}`, { exit: 1 });
+      this.error(`Failed to list module versions`, { exit: 1 });
     }
   }
 }
