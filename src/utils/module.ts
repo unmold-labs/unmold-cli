@@ -50,6 +50,7 @@ export const list = async (params: {
 
 export const publish = async (path: string, metadata: IModuleMetadata) => {
   const { namespace, name, version, system } = metadata;
+  const MAX_MODULE_SIZE = api.uploadSizeLimitMB * 1024 * 1024; // 20MB in bytes
 
   try {
     if (!isValidVersion(version)) {
@@ -58,6 +59,13 @@ export const publish = async (path: string, metadata: IModuleMetadata) => {
 
     // Zip the folder and get it as a buffer
     const zipBuffer = await zipFolderToBuffer(path);
+
+    // Check if the buffer exceeds the maximum allowed size
+    if (zipBuffer.length > MAX_MODULE_SIZE) {
+      throw new Error(
+        `Module size (${(zipBuffer.length / (1024 * 1024)).toFixed(2)}MB) exceeds the maximum allowed size of 20MB`,
+      );
+    }
 
     const result = await fetch(
       `${api.url}/v1/modules/${namespace}/${name}/${system}/${version}`,
