@@ -41,8 +41,7 @@
     "@oclif/plugin-not-found": "^3.2.57",
     "@oclif/plugin-version": "^2.2.30",
     "@oclif/plugin-warn-if-update-available": "^3.1.42",
-    "archiver": "^7.0.1",
-    "semver": "^7.7.2"
+    "archiver": "^7.0.1"
   },
   "devDependencies": {
     "@oclif/test": "^4.1.13",
@@ -51,7 +50,6 @@
     "@types/mocha": "^10.0.10",
     "@types/node": "^18.19.113",
     "@types/node-fetch": "^2.6.12",
-    "@types/semver": "^7.7.0",
     "chai": "^5.2.0",
     "mocha": "^11.7.1",
     "nock": "^13.5.4",
