@@ -23,14 +23,14 @@ export interface IModuleMetadata {
   system: string;
 }
 
-export const list = async (params: {
+export async function list(params: {
   namespace: string;
   name: string;
   system?: string;
-}): Promise<IModuleMetadata[]> => {
+}): Promise<IModuleMetadata[]> {
   const { namespace, name, system = "generic" } = params;
   const result = await fetch(
-    `${api.url}/v1/modules/${namespace}/${name}/${system}/versions`,
+    `${api.url}/modules/v1/${namespace}/${name}/${system}/versions`,
   );
 
   if (!result.ok) {
@@ -43,12 +43,12 @@ export const list = async (params: {
   return versions.map((data: any) => ({
     namespace,
     name,
-    version: data.version,
     system,
+    version: data.version,
   }));
-};
+}
 
-export const publish = async (path: string, metadata: IModuleMetadata) => {
+export async function publish(path: string, metadata: IModuleMetadata) {
   const { namespace, name, version, system } = metadata;
   const MAX_MODULE_SIZE = api.uploadSizeLimitMB * 1024 * 1024; // 20MB in bytes
 
@@ -68,7 +68,7 @@ export const publish = async (path: string, metadata: IModuleMetadata) => {
     }
 
     const result = await fetch(
-      `${api.url}/v1/modules/${namespace}/${name}/${system}/${version}`,
+      `${api.url}/modules/v1/${namespace}/${name}/${system}/${version}`,
       {
         method: "POST",
         headers: {
@@ -90,7 +90,29 @@ export const publish = async (path: string, metadata: IModuleMetadata) => {
     console.error("Error during module publishing:", error);
     throw error;
   }
-};
+}
+
+export function parseIdentifier(identifier: string): {
+  namespace: string;
+  name: string;
+  system: string;
+} {
+  let [namespace, name, system] = identifier.split("/");
+
+  if (!namespace) {
+    throw new Error("Module namespace is not defined for publication.");
+  }
+
+  if (!name) {
+    throw new Error("Module name is not defined for publication.");
+  }
+
+  if (!system) {
+    system = "generic";
+  }
+
+  return { namespace, name, system };
+}
 
 /**
  * Zips a folder and returns it as a buffer
@@ -130,6 +152,6 @@ function isValidVersion(version: string): boolean {
   return (
     typeof version === "string" &&
     version.trim() !== "" &&
-    version.indexOf("/") === -1
+    encodeURIComponent(version) === version
   );
 }

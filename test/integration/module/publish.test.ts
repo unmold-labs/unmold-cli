@@ -32,17 +32,15 @@ describe("publish", () => {
   it("should publish a module successfully", async () => {
     // Mock the API response
     const scope = nock(config.api.url)
-      .post("/v1/modules/test-ns/test-mod/terraform/1.0.0")
+      .post("/modules/v1/test-ns/test-mod/terraform/1.0.0")
       .reply(200, { success: true });
 
     const { stdout } = await runCommand([
       "module",
       "publish",
-      "test-ns",
-      "test-mod",
+      "test-ns/test-mod/terraform",
       "1.0.0",
-      "--system",
-      "terraform",
+      "-y",
       "--path",
       modulePath,
     ]);
@@ -53,15 +51,15 @@ describe("publish", () => {
 
   it("should use default system when not provided", async () => {
     const scope = nock(config.api.url)
-      .post("/v1/modules/test-ns/test-mod/generic/1.0.0")
+      .post("/modules/v1/test-ns/test-mod/generic/1.0.0")
       .reply(200, { success: true });
 
     const { stdout } = await runCommand([
       "module",
       "publish",
-      "test-ns",
-      "test-mod",
+      "test-ns/test-mod",
       "1.0.0",
+      "-y",
       "--path",
       modulePath,
     ]);
@@ -70,8 +68,6 @@ describe("publish", () => {
     scope.done();
   });
 
-  // Skipping size check test as it requires actual file system operations
-  // that are better suited for unit tests
   it.skip("should fail when module is too large", async () => {
     // This test is skipped because it requires mocking the file system
     // which is better handled in unit tests
@@ -91,9 +87,9 @@ describe("publish", () => {
     const { stderr } = await runCommand([
       "module",
       "publish",
-      "test-ns",
-      "test-mod",
+      "test-ns/test-mod",
       "1.0.0",
+      "-y",
       "--path",
       nonExistentPath,
     ]);
