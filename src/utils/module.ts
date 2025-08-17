@@ -74,7 +74,7 @@ export async function publish(path: string, metadata: IModuleMetadata) {
         headers: {
           "Content-Type": "application/zip",
         },
-        body: zipBuffer,
+        body: new Uint8Array(zipBuffer),
       },
     );
 

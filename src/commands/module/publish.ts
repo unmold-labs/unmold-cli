@@ -52,11 +52,10 @@ export default class ModulePublish extends Command {
         version: args.version,
       };
 
-      this.log(`Publishing the following module:`);
-
-      this.logJson(metadata);
-
       if (!flags.confirm) {
+        this.log(`Publishing the following module:`);
+        this.logJson(metadata);
+
         const answer = await confirm({ message: "Continue?" });
 
         if (!answer) {
@@ -67,7 +66,7 @@ export default class ModulePublish extends Command {
       await publish(modulePath, metadata);
 
       this.log(
-        `✅ Successfully published ${metadata.namespace}/${metadata.name}@${metadata.version}`,
+        `✅ Successfully published ${metadata.namespace}/${metadata.name}/${metadata.system}@${metadata.version}`,
       );
     } catch (error) {
       if (error instanceof Error) {
