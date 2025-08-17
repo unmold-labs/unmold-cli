@@ -35,7 +35,7 @@ describe("publish", () => {
       .post("/modules/v1/test-ns/test-mod/terraform/1.0.0")
       .reply(200, { success: true });
 
-    const { stdout } = await runCommand([
+    const { stdout, stderr } = await runCommand([
       "module",
       "publish",
       "test-ns/test-mod/terraform",
@@ -45,7 +45,10 @@ describe("publish", () => {
       modulePath,
     ]);
 
-    expect(stdout).to.include("Successfully published test-ns/test-mod@1.0.0");
+    expect(stderr).to.be.empty;
+    expect(stdout).to.include(
+      "Successfully published test-ns/test-mod/terraform@1.0.0",
+    );
     scope.done();
   });
 
@@ -54,7 +57,7 @@ describe("publish", () => {
       .post("/modules/v1/test-ns/test-mod/generic/1.0.0")
       .reply(200, { success: true });
 
-    const { stdout } = await runCommand([
+    const { stdout, stderr } = await runCommand([
       "module",
       "publish",
       "test-ns/test-mod",
@@ -64,7 +67,10 @@ describe("publish", () => {
       modulePath,
     ]);
 
-    expect(stdout).to.include("Successfully published test-ns/test-mod@1.0.0");
+    expect(stderr).to.be.empty;
+    expect(stdout).to.include(
+      "Successfully published test-ns/test-mod/generic@1.0.0",
+    );
     scope.done();
   });
 
