@@ -6,7 +6,7 @@ import { config } from "../../test-helper";
 
 describe("list", () => {
   it("should print module versions with the default system name", async () => {
-    const scope = nock(config.api.url)
+    const scope = nock(`https://${config.api.host}`)
       .get("/modules/v1/unmold-test/test-mod/generic/versions")
       .reply(200, {
         modules: [
@@ -40,7 +40,7 @@ describe("list", () => {
   });
 
   it("should print module versions with the specified system name", async () => {
-    const scope = nock(config.api.url)
+    const scope = nock(`https://${config.api.host}`)
       .get("/modules/v1/unmold-test/test-mod/aws/versions")
       .reply(200, {
         modules: [

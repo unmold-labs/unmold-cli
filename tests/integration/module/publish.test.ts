@@ -31,7 +31,7 @@ describe("publish", () => {
 
   it("should publish a module successfully", async () => {
     // Mock the API response
-    const scope = nock(config.api.url)
+    const scope = nock(`https://${config.api.host}`)
       .post("/modules/v1/unmold-test/test-mod/terraform/1.0.0")
       .reply(200, { success: true });
 
@@ -53,7 +53,7 @@ describe("publish", () => {
   });
 
   it("should use default system when not provided", async () => {
-    const scope = nock(config.api.url)
+    const scope = nock(`https://${config.api.host}`)
       .post("/modules/v1/unmold-test/test-mod/generic/1.0.0")
       .reply(200, { success: true });
 
