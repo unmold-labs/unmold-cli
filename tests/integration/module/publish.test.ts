@@ -32,13 +32,13 @@ describe("publish", () => {
   it("should publish a module successfully", async () => {
     // Mock the API response
     const scope = nock(config.api.url)
-      .post("/modules/v1/test-ns/test-mod/terraform/1.0.0")
+      .post("/modules/v1/unmold-test/test-mod/terraform/1.0.0")
       .reply(200, { success: true });
 
     const { stdout, stderr } = await runCommand([
       "module",
       "publish",
-      "test-ns/test-mod/terraform",
+      "unmold-test/test-mod/terraform",
       "1.0.0",
       "-y",
       "--path",
@@ -47,20 +47,20 @@ describe("publish", () => {
 
     expect(stderr).to.be.empty;
     expect(stdout).to.include(
-      "Successfully published test-ns/test-mod/terraform@1.0.0",
+      "Successfully published unmold-test/test-mod/terraform@1.0.0",
     );
     scope.done();
   });
 
   it("should use default system when not provided", async () => {
     const scope = nock(config.api.url)
-      .post("/modules/v1/test-ns/test-mod/generic/1.0.0")
+      .post("/modules/v1/unmold-test/test-mod/generic/1.0.0")
       .reply(200, { success: true });
 
     const { stdout, stderr } = await runCommand([
       "module",
       "publish",
-      "test-ns/test-mod",
+      "unmold-test/test-mod",
       "1.0.0",
       "-y",
       "--path",
@@ -69,7 +69,7 @@ describe("publish", () => {
 
     expect(stderr).to.be.empty;
     expect(stdout).to.include(
-      "Successfully published test-ns/test-mod/generic@1.0.0",
+      "Successfully published unmold-test/test-mod/generic@1.0.0",
     );
     scope.done();
   });
@@ -93,11 +93,26 @@ describe("publish", () => {
     const { stderr } = await runCommand([
       "module",
       "publish",
-      "test-ns/test-mod",
+      "unmold-test/test-mod",
       "1.0.0",
       "-y",
       "--path",
       nonExistentPath,
+    ]);
+
+    // The actual error message might be different, so we'll just check that there was an error
+    expect(stderr).to.not.be.empty;
+  });
+
+  it("should fail when module name is not url-safe", async () => {
+    const { stderr } = await runCommand([
+      "module",
+      "publish",
+      "unmold-test/test-mo?!@#d",
+      "1.0.0",
+      "-y",
+      "--path",
+      modulePath,
     ]);
 
     // The actual error message might be different, so we'll just check that there was an error
