@@ -1,9 +1,8 @@
 import archiver from "archiver";
 import { existsSync } from "node:fs";
 
+import { authenticatedRequest } from "../utils/index";
 import { unmold } from "../utils/config";
-
-const { api } = unmold;
 
 export interface IModuleMetadata {
   /**
@@ -30,8 +29,8 @@ export async function list(params: {
   system?: string;
 }): Promise<IModuleMetadata[]> {
   const { namespace, name, system = "generic" } = params;
-  const result = await fetch(
-    `${api.url}/modules/v1/${namespace}/${name}/${system}/versions`,
+  const result = await authenticatedRequest(
+    `modules/v1/${namespace}/${name}/${system}/versions`,
   );
 
   if (!result.ok) {
@@ -51,7 +50,7 @@ export async function list(params: {
 
 export async function publish(path: string, metadata: IModuleMetadata) {
   const { namespace, name, version, system } = metadata;
-  const MAX_MODULE_SIZE = api.uploadSizeLimitMB * 1024 * 1024; // 20MB in bytes
+  const MAX_MODULE_SIZE = unmold.api.uploadSizeLimitMB * 1024 * 1024; // 20MB in bytes
 
   try {
     if (!isValidVersion(version)) {
@@ -72,8 +71,8 @@ export async function publish(path: string, metadata: IModuleMetadata) {
       );
     }
 
-    const result = await fetch(
-      `${api.url}/modules/v1/${namespace}/${name}/${system}/${version}`,
+    const result = await authenticatedRequest(
+      `modules/v1/${namespace}/${name}/${system}/${version}`,
       {
         method: "POST",
         headers: {

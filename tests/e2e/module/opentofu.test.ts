@@ -9,6 +9,8 @@ import { v4 as uuid } from "uuid";
 
 import { config } from "../../test-helper";
 
+const namespace = config.testModuleNamespace;
+
 describe("Opentofu", () => {
   let tempDir: string;
   let modulePath: string;
@@ -36,7 +38,7 @@ describe("Opentofu", () => {
     const { stderr: publishError } = await runCommand([
       "module",
       "publish",
-      `unmold-test/test-mod-${uniqueId}`,
+      `${namespace}/test-mod-${uniqueId}`,
       "1.0.0",
       "-y",
       "--path",
@@ -51,13 +53,16 @@ describe("Opentofu", () => {
     fs.writeFileSync(
       path.join(projectPath, "main.tf"),
       `module "example" {
-        source  = "${config.api.host}/unmold-test/test-mod-${uniqueId}/generic"
+        source  = "${config.api.host}/${namespace}/test-mod-${uniqueId}/generic"
         version = "1.0.0"
       }`,
     );
 
     const { stdout, stderr } = await execa("tofu", ["init", "-no-color"], {
       cwd: projectPath,
+      env: {
+        [`TF_TOKEN_${config.api.host.replace(/\./g, "_")}`]: config.api.token,
+      },
     });
 
     expect(stderr).to.be.empty;
