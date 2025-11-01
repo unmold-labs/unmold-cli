@@ -80,7 +80,7 @@ describe("publish", () => {
       .reply(200, { success: true })
       .get("/users/v1/current")
       .reply(200, {
-        username: "unmold-test",
+        name: "unmold-test",
         email: "unmold-test@example.com",
       });
 
