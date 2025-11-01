@@ -30,6 +30,25 @@ describe("publish", () => {
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
 
+  it("should publish a module with username as namespace", async () => {
+    const version = randomSemver();
+    const { stdout, stderr } = await runCommand([
+      "module",
+      "publish",
+      "publish-test-default-system",
+      version,
+      "-y",
+      "--path",
+      modulePath,
+    ]);
+
+    expect(stderr).to.be.empty;
+    expect(stdout).to.include(
+      // "unmold-test" is the username of the test token
+      `Successfully published unmold-test/publish-test-default-system/generic@${version}`,
+    );
+  });
+
   it("should publish a module with the default system name", async () => {
     const version = randomSemver();
     const { stdout, stderr } = await runCommand([

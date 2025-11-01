@@ -40,7 +40,7 @@ export async function list(filters: {
     path += `/${system}`;
   }
 
-  const result = await authenticatedRequest(`modules/v1/${path}`);
+  const result = await authenticatedRequest(`/modules/v1/${path}`);
 
   if (!result.ok) {
     throw new Error(`Failed to list module versions: ${result.statusText}`);
@@ -80,7 +80,7 @@ export async function publish(path: string, metadata: IModuleMetadata) {
     }
 
     const result = await authenticatedRequest(
-      `modules/v1/${namespace}/${name}/${system}/${version}`,
+      `/modules/v1/${namespace}/${name}/${system}/${version}`,
       {
         method: "POST",
         headers: {
@@ -102,28 +102,6 @@ export async function publish(path: string, metadata: IModuleMetadata) {
     console.error("Error during module publishing:", error);
     throw error;
   }
-}
-
-export function parseIdentifier(identifier: string): {
-  namespace: string;
-  name: string;
-  system: string;
-} {
-  let [namespace, name, system] = identifier.split("/");
-
-  if (!namespace) {
-    throw new Error("Module namespace is not defined for publication.");
-  }
-
-  if (!name) {
-    throw new Error("Module name is not defined for publication.");
-  }
-
-  if (!system) {
-    system = "generic";
-  }
-
-  return { namespace, name, system };
 }
 
 /**
