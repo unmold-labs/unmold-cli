@@ -22,16 +22,23 @@ The CLI reads `UNMOLD_API_TOKEN` for authenticated API requests.
 
 ## Quickstart
 
-Publish a module (assumes current dir has module files or use `--path`):
+Publish a module
 
 ```bash
-unmold module publish <name> <version>
-
-# example
+# publish a module within current user's username as namespace
 unmold module publish my-module 1.0.0
+
+# publish a module within a namespace
+unmold module publish my-namespace/my-module 1.0.0
+
+# publish a module within a namespace for a system
+unmold module publish my-namespace/my-module/aws 1.0.0
+
+# publish a module with non-semver version, like git commit SHA
+unmold module publish my-module 70e21a8fb88d6d5f76f18a1516425037caff2a20
 ```
 
-List modules for a namespace:
+List modules and versions
 
 ```bash
 # list modules within a namespace
