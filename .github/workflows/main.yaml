@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
   workflow_dispatch: # This makes the workflow manually triggerable
 
 jobs:
@@ -25,6 +28,7 @@ jobs:
         run: npm run test:integration
 
   test-e2e:
+    if: github.event_name != 'pull_request'
     needs: test
     uses: ./.github/workflows/e2e.yaml
     secrets: inherit
