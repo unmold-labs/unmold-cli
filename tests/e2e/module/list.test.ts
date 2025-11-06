@@ -94,8 +94,10 @@ describe("list", () => {
     const { stderr: publishError } = await runCommand([
       "module",
       "publish",
-      `${namespace}/${moduleName}/aws`,
+      `${namespace}/${moduleName}`,
       "1.0.0",
+      "--system",
+      "aws",
       "-y",
       "--path",
       modulePath,

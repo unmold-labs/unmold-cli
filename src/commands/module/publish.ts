@@ -11,7 +11,7 @@ export default class ModulePublish extends Command {
   static override examples = [
     "<%= config.bin %> <%= command.id %> mymodule 1.0.0",
     "<%= config.bin %> <%= command.id %> myorg/mymodule 1.0.0",
-    "<%= config.bin %> <%= command.id %> myorg/mymodule/aws 1.0.0",
+    "<%= config.bin %> <%= command.id %> myorg/mymodule 1.0.0 --system aws",
     "<%= config.bin %> <%= command.id %> myorg/mymodule/aws 1.0.0 --path ./module-dir",
   ];
 
@@ -29,6 +29,11 @@ export default class ModulePublish extends Command {
   };
 
   static override flags = {
+    system: Flags.string({
+      char: "s",
+      description: "Target system for the module",
+      default: "generic",
+    }),
     path: Flags.string({
       char: "p",
       description: "path to the module directory",
@@ -46,8 +51,9 @@ export default class ModulePublish extends Command {
 
     try {
       const modulePath = resolve(flags.path);
+      const system = flags.system;
 
-      let { namespace, name, system } = this.parseIdentifiers(args.identifiers);
+      let { namespace, name } = this.parseIdentifiers(args.identifiers);
 
       if (!namespace) {
         const userProfile = await getUserProfile();
@@ -91,23 +97,22 @@ export default class ModulePublish extends Command {
   private parseIdentifiers(identifiers: string): {
     namespace?: string;
     name: string;
-    system: string;
   } {
     const parts = identifiers.split("/");
 
     if (parts.length === 3) {
       const [namespace, name, system] = parts;
-      return { namespace, name, system };
+      return { namespace, name };
     } else if (parts.length === 2) {
       const [namespace, name] = parts;
-      return { namespace, name, system: "generic" };
+      return { namespace, name };
     } else if (parts.length === 1) {
       const name = parts[0];
-      return { name, system: "generic" };
+      return { name };
     }
 
     throw new Error(
-      `Invalid module identifier format: ${identifiers}. Expected format: [namespace]/name/[system]`,
+      `Invalid module identifier format: ${identifiers}. Expected format: [namespace]/name`,
     );
   }
 }
