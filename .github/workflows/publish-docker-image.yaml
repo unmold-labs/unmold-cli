@@ -22,12 +22,13 @@ jobs:
           password: ${{ secrets.QUAY_PASSWORD }}
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-      - name: Build and push Docker image
+      - name: Build and push Docker image (multi-platform)
         uses: docker/build-push-action@v6
         with:
           context: .
           file: ./Dockerfile
           push: true
           tags: quay.io/unmold/unmold-cli:${{ inputs.tag}}
+          platforms: linux/amd64,linux/arm64
           cache-from: type=gha
           cache-to: type=gha,mode=max
