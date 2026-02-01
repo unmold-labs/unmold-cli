@@ -40,7 +40,7 @@ describe("Opentofu", () => {
       "publish",
       `${namespace}/test-mod-${uniqueId}`,
       "1.0.0",
-      "-y",
+      "--confirm",
       "--path",
       modulePath,
     ]);

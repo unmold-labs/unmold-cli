@@ -1,7 +1,7 @@
 import { Command } from "@oclif/core";
 
 export default class ModuleTopic extends Command {
-  static summary = "Publish and manage existing modules";
+  static summary = "Publish and manage modules";
   static description =
     "Commands to publish, list and manage modules in the Unmold registry";
 

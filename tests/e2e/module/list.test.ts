@@ -40,7 +40,7 @@ describe("list", () => {
       "publish",
       `${namespace}/${moduleName}`,
       "1.0.0",
-      "-y",
+      "--confirm",
       "--path",
       modulePath,
     ]);
@@ -65,7 +65,7 @@ describe("list", () => {
       "publish",
       `${namespace}/${moduleName}`,
       "1.0.0",
-      "-y",
+      "--confirm",
       "--path",
       modulePath,
     ]);
@@ -98,7 +98,7 @@ describe("list", () => {
       "1.0.0",
       "--system",
       "aws",
-      "-y",
+      "--confirm",
       "--path",
       modulePath,
     ]);

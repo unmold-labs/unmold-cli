@@ -37,7 +37,7 @@ describe("publish", () => {
       "publish",
       "publish-test-default-system",
       version,
-      "-y",
+      "--confirm",
       "--path",
       modulePath,
     ]);
@@ -56,7 +56,7 @@ describe("publish", () => {
       "publish",
       `${namespace}/publish-test-default-system`,
       version,
-      "-y",
+      "--confirm",
       "--path",
       modulePath,
     ]);
@@ -74,7 +74,7 @@ describe("publish", () => {
       "publish",
       `${namespace}/publish-test-custom-system`,
       version,
-      "-y",
+      "--confirm",
       "--system",
       "custom",
       "--path",

@@ -40,7 +40,7 @@ export default class ModulePublish extends Command {
       default: ".",
     }),
     confirm: Flags.boolean({
-      char: "y",
+      char: "c",
       description: "Confirm the publication",
       default: false,
     }),
