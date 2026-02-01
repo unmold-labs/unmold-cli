@@ -40,7 +40,7 @@ describe("publish", () => {
       "publish",
       "unmold-test/test-mod",
       "1.0.0",
-      "-y",
+      "--confirm",
       "--path",
       modulePath,
       "--system",
@@ -64,7 +64,7 @@ describe("publish", () => {
       "publish",
       "unmold-test/test-mod",
       "1.0.0",
-      "-y",
+      "--confirm",
       "--path",
       modulePath,
     ]);
@@ -91,7 +91,7 @@ describe("publish", () => {
       "publish",
       "test-mod",
       "1.0.0",
-      "-y",
+      "--confirm",
       "--path",
       modulePath,
     ]);
@@ -125,7 +125,7 @@ describe("publish", () => {
       "publish",
       "unmold-test/test-mod",
       "1.0.0",
-      "-y",
+      "--confirm",
       "--path",
       nonExistentPath,
     ]);
@@ -140,7 +140,7 @@ describe("publish", () => {
       "publish",
       "unmold-test/test-mo?!@#d",
       "1.0.0",
-      "-y",
+      "--confirm",
       "--path",
       modulePath,
     ]);
