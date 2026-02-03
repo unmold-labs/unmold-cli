@@ -39,6 +39,11 @@ export default class ModulePublish extends Command {
       description: "path to the module directory",
       default: ".",
     }),
+    overwrite: Flags.boolean({
+      char: "o",
+      description: "Overwrite existing module version if present",
+      default: false,
+    }),
     confirm: Flags.boolean({
       char: "c",
       description: "Confirm the publication",
@@ -78,7 +83,7 @@ export default class ModulePublish extends Command {
         }
       }
 
-      await publish(modulePath, metadata);
+      await publish(modulePath, metadata, flags.overwrite);
 
       this.log(
         `✅ Successfully published ${metadata.namespace}/${metadata.name}/${metadata.system}@${metadata.version}`,

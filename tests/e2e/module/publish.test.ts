@@ -86,4 +86,41 @@ describe("publish", () => {
       `Successfully published ${namespace}/publish-test-custom-system/custom@${version}`,
     );
   });
+
+  it("should allow overwrite when re-publishing the same version", async () => {
+    const version = randomSemver();
+
+    // initial publish
+    const first = await runCommand([
+      "module",
+      "publish",
+      `${namespace}/publish-test-overwrite`,
+      version,
+      "--confirm",
+      "--path",
+      modulePath,
+    ]);
+
+    expect(first.stderr).to.be.empty;
+    expect(first.stdout).to.include(
+      `Successfully published ${namespace}/publish-test-overwrite/generic@${version}`,
+    );
+
+    // publish again with --overwrite
+    const second = await runCommand([
+      "module",
+      "publish",
+      `${namespace}/publish-test-overwrite`,
+      version,
+      "--confirm",
+      "--path",
+      modulePath,
+      "--overwrite",
+    ]);
+
+    expect(second.stderr).to.be.empty;
+    expect(second.stdout).to.include(
+      `Successfully published ${namespace}/publish-test-overwrite/generic@${version}`,
+    );
+  });
 });

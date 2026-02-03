@@ -26,7 +26,7 @@ export const mochaHooks = {
 // Test configuration
 export const config = {
   api: {
-    host: "c5e0kl1q11.execute-api.us-east-1.amazonaws.com",
+    host: "api.unmold.dev",
     token: process.env.UNMOLD_API_TOKEN || "test-token",
     uploadSizeLimitMB: 20,
   },

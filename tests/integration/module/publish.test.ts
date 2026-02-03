@@ -109,6 +109,32 @@ describe("publish", () => {
     // which is better handled in unit tests
   });
 
+  it("should publish with overwrite flag", async () => {
+    const scope = nock(`https://${config.api.host}`)
+      .post("/modules/v1/unmold-test/test-mod/terraform/1.0.0")
+      .query({ overwrite: "true" })
+      .reply(200, { success: true });
+
+    const { stdout, stderr } = await runCommand([
+      "module",
+      "publish",
+      "unmold-test/test-mod",
+      "1.0.0",
+      "--confirm",
+      "--path",
+      modulePath,
+      "--system",
+      "terraform",
+      "--overwrite",
+    ]);
+
+    expect(stderr).to.be.empty;
+    expect(stdout).to.include(
+      "Successfully published unmold-test/test-mod/terraform@1.0.0",
+    );
+    scope.done();
+  });
+
   it("should show help when no arguments are provided", async () => {
     const { stdout } = await runCommand(["module", "publish", "--help"]);
     expect(stdout).to.include("Publish a new version of a module");
