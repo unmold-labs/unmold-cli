@@ -38,7 +38,7 @@ describe("list", () => {
     const { stderr: publishError } = await runCommand([
       "module",
       "publish",
-      `${namespace}/${moduleName}`,
+      moduleName,
       "1.0.0",
       "--confirm",
       "--path",
@@ -46,11 +46,7 @@ describe("list", () => {
     ]);
     expect(publishError).to.be.empty;
 
-    const { stdout, stderr } = await runCommand([
-      "module",
-      "list",
-      `${namespace}`,
-    ]);
+    const { stdout, stderr } = await runCommand(["module", "list", namespace]);
 
     expect(stderr).to.be.empty;
     expect(JSON.parse(stdout).length).to.be.greaterThan(0);
@@ -63,7 +59,7 @@ describe("list", () => {
     const { stderr: publishError } = await runCommand([
       "module",
       "publish",
-      `${namespace}/${moduleName}`,
+      moduleName,
       "1.0.0",
       "--confirm",
       "--path",
@@ -94,7 +90,7 @@ describe("list", () => {
     const { stderr: publishError } = await runCommand([
       "module",
       "publish",
-      `${namespace}/${moduleName}`,
+      moduleName,
       "1.0.0",
       "--system",
       "aws",

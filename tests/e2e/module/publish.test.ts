@@ -54,7 +54,7 @@ describe("publish", () => {
     const { stdout, stderr } = await runCommand([
       "module",
       "publish",
-      `${namespace}/publish-test-default-system`,
+      "publish-test-default-system",
       version,
       "--confirm",
       "--path",
@@ -72,7 +72,7 @@ describe("publish", () => {
     const { stdout, stderr } = await runCommand([
       "module",
       "publish",
-      `${namespace}/publish-test-custom-system`,
+      "publish-test-custom-system",
       version,
       "--confirm",
       "--system",
@@ -94,7 +94,7 @@ describe("publish", () => {
     const first = await runCommand([
       "module",
       "publish",
-      `${namespace}/publish-test-overwrite`,
+      "publish-test-overwrite",
       version,
       "--confirm",
       "--path",
@@ -110,7 +110,7 @@ describe("publish", () => {
     const second = await runCommand([
       "module",
       "publish",
-      `${namespace}/publish-test-overwrite`,
+      "publish-test-overwrite",
       version,
       "--confirm",
       "--path",
