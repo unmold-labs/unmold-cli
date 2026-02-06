@@ -50,7 +50,8 @@
     "@oclif/plugin-update": "^4.7.13",
     "@oclif/plugin-version": "^2.2.30",
     "@oclif/plugin-warn-if-update-available": "^3.1.42",
-    "archiver": "^7.0.1"
+    "archiver": "^7.0.1",
+    "ignore": "^7.0.0"
   },
   "devDependencies": {
     "@dotenvx/dotenvx": "^1.51.0",
@@ -72,7 +73,8 @@
     "simple-git-hooks": "^2.13.0",
     "ts-jest": "^29.4.0",
     "ts-node": "^10.9.2",
-    "uuid": "^11.1.0"
+    "uuid": "^11.1.0",
+    "fflate": "^0.7.5"
   },
   "simple-git-hooks": {
     "pre-commit": "npx pretty-quick --staged",
