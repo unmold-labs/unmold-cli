@@ -42,6 +42,10 @@ describe("publish", () => {
       modulePath,
     ]);
 
+    if (stderr) {
+      console.error("Error output:", stderr);
+    }
+
     expect(stderr).to.be.empty;
     expect(stdout).to.include(
       // "unmold-test" is the username of the test token
@@ -60,6 +64,10 @@ describe("publish", () => {
       "--path",
       modulePath,
     ]);
+
+    if (stderr) {
+      console.error("Error output:", stderr);
+    }
 
     expect(stderr).to.be.empty;
     expect(stdout).to.include(
@@ -81,6 +89,10 @@ describe("publish", () => {
       modulePath,
     ]);
 
+    if (stderr) {
+      console.error("Error output:", stderr);
+    }
+
     expect(stderr).to.be.empty;
     expect(stdout).to.include(
       `Successfully published ${namespace}/publish-test-custom-system/custom@${version}`,
@@ -101,6 +113,10 @@ describe("publish", () => {
       modulePath,
     ]);
 
+    if (first.stderr) {
+      console.error("Error output (first):", first.stderr);
+    }
+
     expect(first.stderr).to.be.empty;
     expect(first.stdout).to.include(
       `Successfully published ${namespace}/publish-test-overwrite/generic@${version}`,
@@ -117,6 +133,10 @@ describe("publish", () => {
       modulePath,
       "--overwrite",
     ]);
+
+    if (second.stderr) {
+      console.error("Error output (second):", second.stderr);
+    }
 
     expect(second.stderr).to.be.empty;
     expect(second.stdout).to.include(
