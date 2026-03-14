@@ -4,7 +4,7 @@ import { randomBytes } from "node:crypto";
 import { spawn } from "node:child_process";
 
 import { unmold } from "../utils/config";
-import { getConfigPath, saveToken } from "../utils/token";
+import { getConfigPath, readStoredToken, saveToken } from "../utils/token";
 
 const DEFAULT_CLIENT_ID = "unmold-cli";
 const DEFAULT_TIMEOUT_SECONDS = 300;
@@ -29,6 +29,14 @@ export default class Login extends Command {
 
   public async run(): Promise<void> {
     const { flags } = await this.parse(Login);
+    const existingToken = await readStoredToken();
+
+    if (existingToken) {
+      this.error(
+        "You are already authenticated locally. Run 'unmold logout' to sign out before logging in again.",
+        { exit: 1 },
+      );
+    }
 
     let server: ReturnType<typeof createServer> | undefined;
 

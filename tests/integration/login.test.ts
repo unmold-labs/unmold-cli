@@ -62,6 +62,30 @@ describe("login", () => {
     const saved = JSON.parse(fs.readFileSync(configPath, "utf8"));
     expect(saved.token).to.equal("token-123");
   });
+
+  it("asks the user to logout when local auth already exists", async () => {
+    fs.writeFileSync(
+      configPath,
+      JSON.stringify({ token: "existing-token" }),
+      "utf8",
+    );
+
+    const result = await execa(
+      "node",
+      ["bin/dev.js", "login", "--no-browser"],
+      {
+        cwd: process.cwd(),
+        env: {
+          ...process.env,
+          UNMOLD_CONFIG_PATH: configPath,
+        },
+        reject: false,
+      },
+    );
+
+    expect(result.exitCode).to.equal(1);
+    expect(result.stderr).to.include("Run 'unmold logout' to sign out");
+  });
 });
 
 function waitForAuthorizeUrl(child: execa.ExecaChildProcess) {
