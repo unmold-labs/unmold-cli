@@ -1,4 +1,5 @@
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
+import { access, mkdir, rm, writeFile, readFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { homedir } from "node:os";
 
@@ -13,7 +14,7 @@ export function getConfigPath(): string {
   );
 }
 
-export function readStoredToken(): string {
+export function readStoredTokenSync(): string {
   const configPath = getConfigPath();
   if (!existsSync(configPath)) {
     return "";
@@ -32,14 +33,43 @@ export function readStoredToken(): string {
   return "";
 }
 
-export function saveToken(token: string): void {
+export async function readStoredToken(): Promise<string> {
   const configPath = getConfigPath();
-  mkdirSync(dirname(configPath), { recursive: true });
+
+  try {
+    await access(configPath);
+    const raw = await readFile(configPath, "utf8");
+    const parsed = JSON.parse(raw) as TokenStore;
+    if (parsed && typeof parsed.token === "string") {
+      return parsed.token;
+    }
+  } catch (_err) {
+    // ignore missing or malformed token files
+  }
+
+  return "";
+}
+
+export async function saveToken(token: string): Promise<void> {
+  const configPath = getConfigPath();
+  await mkdir(dirname(configPath), { recursive: true });
 
   const payload: TokenStore = {
     token,
     savedAt: new Date().toISOString(),
   };
 
-  writeFileSync(configPath, JSON.stringify(payload, null, 2), "utf8");
+  await writeFile(configPath, JSON.stringify(payload, null, 2), "utf8");
+}
+
+export async function clearStoredToken(): Promise<boolean> {
+  const configPath = getConfigPath();
+  try {
+    await access(configPath);
+  } catch (_err) {
+    return false;
+  }
+
+  await rm(configPath, { force: true });
+  return true;
 }

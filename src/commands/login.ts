@@ -78,7 +78,7 @@ export default class Login extends Command {
         throw new Error("Token exchange failed: missing access_token");
       }
 
-      saveToken(accessToken);
+      await saveToken(accessToken);
 
       this.log(`Login successful. Token saved to ${getConfigPath()}.`);
     } catch (error) {
@@ -112,6 +112,9 @@ function openBrowser(url: string): void {
 
     spawn("xdg-open", [url], { stdio: "ignore", detached: true }).unref();
   } catch (_err) {
+    throw new Error(
+      "Failed to open browser for authentication. Please request a token manually at Unmold registry console.",
+    );
     // Best-effort only.
   }
 }

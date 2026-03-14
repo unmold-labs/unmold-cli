@@ -1,6 +1,6 @@
-import { readStoredToken } from "./token";
+import { readStoredTokenSync } from "./token";
 
-const storedToken = readStoredToken();
+const storedToken = readStoredTokenSync();
 
 export const unmold = Object.freeze({
   api: {
