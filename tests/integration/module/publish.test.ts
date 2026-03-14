@@ -1,7 +1,8 @@
 import { runCommand } from "@oclif/test";
 import { expect } from "chai";
 import nock from "nock";
-import * as fs from "fs";
+import * as crypto from "crypto";
+import * as fs from "node:fs/promises";
 import * as path from "path";
 import * as os from "os";
 
@@ -11,22 +12,22 @@ describe("publish", () => {
   let tempDir: string;
   let modulePath: string;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     // Create a temporary directory for testing
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "unmold-test-"));
+    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "unmold-test-"));
     modulePath = path.join(tempDir, "test-module");
 
     // Create a simple module structure
-    fs.mkdirSync(modulePath, { recursive: true });
-    fs.writeFileSync(
+    await fs.mkdir(modulePath, { recursive: true });
+    await fs.writeFile(
       path.join(modulePath, "main.tf"),
       'resource "null_resource" "test" {}',
     );
   });
 
-  afterEach(() => {
+  afterEach(async () => {
     // Clean up the temporary directory
-    fs.rmSync(tempDir, { recursive: true, force: true });
+    await fs.rm(tempDir, { recursive: true, force: true });
   });
 
   it("should publish a module successfully", async () => {
@@ -114,9 +115,31 @@ describe("publish", () => {
     scope.done();
   });
 
-  it.skip("should fail when module is too large", async () => {
-    // This test is skipped because it requires mocking the file system
-    // which is better handled in unit tests
+  it("should fail when module is too large", async () => {
+    const scope = nock(`https://${config.api.host}`)
+      .get("/users/v1/current")
+      .reply(200, {
+        name: "unmold-test",
+        email: "unmold-test@example.com",
+      });
+
+    const oversizedFilePath = path.join(modulePath, "large.bin");
+    // Use random bytes so the zip remains >20MB even after compression.
+    const oversizedBuffer = crypto.randomBytes(21 * 1024 * 1024);
+    await fs.writeFile(oversizedFilePath, oversizedBuffer);
+
+    const { stderr } = await runCommand([
+      "module",
+      "publish",
+      "test-mod",
+      "1.0.0",
+      "--confirm",
+      "--path",
+      modulePath,
+    ]);
+
+    expect(stderr).to.include("exceeds the maximum allowed size");
+    scope.done();
   });
 
   it("should publish with overwrite flag", async () => {
