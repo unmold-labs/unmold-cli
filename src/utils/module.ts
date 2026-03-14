@@ -1,7 +1,8 @@
 import archiver from "archiver";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { PassThrough } from "node:stream";
 import { join } from "node:path";
+import ignore from "ignore";
 
 import { authenticatedRequest } from "../utils/index";
 import { unmold } from "../utils/config";
@@ -126,6 +127,22 @@ async function zipFolderToBuffer(sourceDir: string): Promise<Buffer> {
 
     const pass = new PassThrough();
     const chunks: Buffer[] = [];
+    let settled = false;
+
+    const fail = (err: Error): void => {
+      if (settled) {
+        return;
+      }
+      settled = true;
+
+      try {
+        archive.abort();
+      } catch (_err) {
+        // ignore abort errors
+      }
+
+      reject(err);
+    };
 
     // Build ignore patterns from .gitignore if present
     let ignorePatterns: string[] = [];
@@ -152,22 +169,16 @@ async function zipFolderToBuffer(sourceDir: string): Promise<Buffer> {
     });
 
     // Propagate stream errors to the promise rejection
-    pass.on("error", (err: Error) => reject(err));
+    pass.on("error", fail);
 
-    // Resolve when the passthrough is fully closed. Using 'close' ensures
-    // underlying file descriptors have been released by the archiver.
-    pass.on("close", () => {
-      try {
-        const buffer = Buffer.concat(chunks);
-        resolve(buffer);
-      } finally {
-        // Best-effort cleanup
-        try {
-          archive.destroy();
-        } catch (_e) {
-          // ignore
-        }
+    // Resolve when archive output has ended.
+    pass.on("end", () => {
+      if (settled) {
+        return;
       }
+
+      settled = true;
+      resolve(Buffer.concat(chunks));
     });
 
     // Handle archive warnings (e.g., file stat failures) but continue when appropriate
@@ -179,22 +190,74 @@ async function zipFolderToBuffer(sourceDir: string): Promise<Buffer> {
         console.warn("archiver warning:", err.message || err);
         return;
       }
-      reject(err);
+      fail(err instanceof Error ? err : new Error(String(err)));
     });
 
-    archive.on("error", (err: Error) => {
-      reject(err);
-    });
+    archive.on("error", fail);
 
     // Pipe archive output to passthrough and finalize
     archive.pipe(pass);
 
-    // Add all files in the directory while respecting .gitignore patterns
-    // Use glob with ignore patterns so that unwanted files are excluded
-    archive.glob("**/*", { cwd: sourceDir, dot: true, ignore: ignorePatterns });
+    // Add files explicitly instead of using glob, which avoids a Node v25
+    // warning path where internal file handles may be closed during GC.
+    const matcher = ignore();
+    if (ignorePatterns.length > 0) {
+      matcher.add(ignorePatterns);
+    }
+
+    const shouldIgnore = (
+      relativePath: string,
+      isDirectory = false,
+    ): boolean => {
+      const normalized = relativePath.replace(/\\/g, "/");
+      if (normalized.length === 0) {
+        return false;
+      }
+
+      if (isDirectory) {
+        return matcher.ignores(`${normalized}/`);
+      }
+
+      return matcher.ignores(normalized);
+    };
+
+    const addFiles = (directory: string, relativePrefix = ""): void => {
+      const entries = readdirSync(directory, { withFileTypes: true });
+
+      for (const entry of entries) {
+        const relativePath = relativePrefix
+          ? `${relativePrefix}/${entry.name}`
+          : entry.name;
+        const absolutePath = join(directory, entry.name);
+
+        if (entry.isDirectory()) {
+          if (shouldIgnore(relativePath, true)) {
+            continue;
+          }
+          addFiles(absolutePath, relativePath);
+          continue;
+        }
+
+        if (!entry.isFile()) {
+          continue;
+        }
+
+        if (shouldIgnore(relativePath)) {
+          continue;
+        }
+
+        archive.file(absolutePath, { name: relativePath });
+      }
+    };
+
+    addFiles(sourceDir);
 
     // Finalize the archive; errors will be emitted via 'error' or 'warning'
-    archive.finalize().catch((err) => reject(err));
+    archive
+      .finalize()
+      .catch((err) =>
+        fail(err instanceof Error ? err : new Error(String(err))),
+      );
   });
 }
 
