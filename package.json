@@ -22,7 +22,7 @@
     "set-hooks": "npx simple-git-hooks",
     "pack:macos": "oclif pack macos",
     "pack:win": "oclif pack win",
-    "prepublish": "npm run build && npm run test:integration && npm run test:e2e"
+    "prepublishOnly": "npm run build && npm run test:integration && npm run test:e2e"
   },
   "bin": {
     "unmold": "./bin/run.js"
