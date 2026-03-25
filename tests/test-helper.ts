@@ -10,13 +10,13 @@ global.TextDecoder = TextDecoder as any;
 
 // Common test hooks
 export const mochaHooks = {
-  beforeAll() {
+  async beforeAll() {
     // Runs once before all tests
   },
-  beforeEach() {
+  async beforeEach() {
     // Runs before each test
   },
-  afterEach() {
+  async afterEach() {
     // Clean up after each test
     const nock = require("nock");
     nock.cleanAll();

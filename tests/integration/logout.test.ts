@@ -8,12 +8,12 @@ describe("logout", () => {
   let tempDir: string;
   let configPath: string;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "unmold-logout-"));
     configPath = path.join(tempDir, "config.json");
   });
 
-  afterEach(() => {
+  afterEach(async () => {
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
 

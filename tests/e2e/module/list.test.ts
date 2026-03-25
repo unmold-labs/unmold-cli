@@ -13,7 +13,7 @@ describe("list", () => {
   let tempDir: string;
   let modulePath: string;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     // Create a temporary directory for testing
     tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "unmold-test-"));
     modulePath = path.join(tempDir, "test-module");
@@ -26,7 +26,7 @@ describe("list", () => {
     );
   });
 
-  afterEach(() => {
+  afterEach(async () => {
     // Clean up the temporary directory
     fs.rmSync(tempDir, { recursive: true, force: true });
   });

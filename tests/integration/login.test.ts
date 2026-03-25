@@ -12,12 +12,12 @@ describe("login", () => {
   let tokenServer: ReturnType<typeof createServer> | undefined;
   let tokenBaseUrl = "";
 
-  beforeEach(() => {
+  beforeEach(async () => {
     tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "unmold-login-"));
     configPath = path.join(tempDir, "config.json");
   });
 
-  afterEach(() => {
+  afterEach(async () => {
     fs.rmSync(tempDir, { recursive: true, force: true });
     if (tokenServer) {
       tokenServer.close();
