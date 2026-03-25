@@ -37,7 +37,6 @@
       "@oclif/plugin-help",
       "@oclif/plugin-not-found",
       "@oclif/plugin-version",
-      "@oclif/plugin-update",
       "@oclif/plugin-warn-if-update-available"
     ],
     "macos": {
@@ -49,7 +48,6 @@
     "@oclif/core": "^4.4.0",
     "@oclif/plugin-help": "^6.2.29",
     "@oclif/plugin-not-found": "^3.2.57",
-    "@oclif/plugin-update": "^4.7.22",
     "@oclif/plugin-version": "^2.2.30",
     "@oclif/plugin-warn-if-update-available": "^3.1.42",
     "ignore": "^7.0.0",
