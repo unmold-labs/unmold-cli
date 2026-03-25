@@ -246,7 +246,10 @@ async function zipFolderToBuffer(sourceDir: string): Promise<Buffer> {
           continue;
         }
 
-        archive.file(absolutePath, { name: relativePath });
+        // Append file content directly to avoid archiver opening file handles
+        // that may be finalized by GC on newer Node versions.
+        const fileContent = readFileSync(absolutePath);
+        archive.append(fileContent, { name: relativePath });
       }
     };
 
