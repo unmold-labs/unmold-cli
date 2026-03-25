@@ -1,6 +1,6 @@
 import { runCommand } from "@oclif/test";
 import { expect } from "chai";
-import * as fs from "fs";
+import * as fs from "node:fs/promises";
 import * as path from "path";
 import * as os from "os";
 
@@ -14,12 +14,12 @@ describe("publish", () => {
 
   beforeEach(async () => {
     // Create a temporary directory for testing
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "unmold-test-"));
+    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "unmold-test-"));
     modulePath = path.join(tempDir, "test-module");
 
     // Create a simple module structure
-    fs.mkdirSync(modulePath, { recursive: true });
-    fs.writeFileSync(
+    await fs.mkdir(modulePath, { recursive: true });
+    await fs.writeFile(
       path.join(modulePath, "main.tf"),
       'resource "null_resource" "test" {}',
     );
@@ -27,7 +27,7 @@ describe("publish", () => {
 
   afterEach(async () => {
     // Clean up the temporary directory
-    fs.rmSync(tempDir, { recursive: true, force: true });
+    await fs.rm(tempDir, { recursive: true, force: true });
   });
 
   it("should publish a module with username as namespace", async () => {

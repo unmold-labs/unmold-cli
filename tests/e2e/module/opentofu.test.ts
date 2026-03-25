@@ -2,7 +2,7 @@ import { runCommand } from "@oclif/test";
 import { expect } from "chai";
 import { execa } from "execa";
 
-import * as fs from "fs";
+import * as fs from "node:fs/promises";
 import * as path from "path";
 import * as os from "os";
 import { v4 as uuid } from "uuid";
@@ -18,19 +18,19 @@ describe("Opentofu", () => {
 
   beforeEach(async () => {
     // Create a temporary directory for testing
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "unmold-test-"));
+    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "unmold-test-"));
     modulePath = path.join(tempDir, "test-module");
 
     // Create a simple module
-    fs.mkdirSync(modulePath, { recursive: true });
-    fs.writeFileSync(
+    await fs.mkdir(modulePath, { recursive: true });
+    await fs.writeFile(
       path.join(modulePath, "main.tf"),
       'resource "null_resource" "test" {}',
     );
   });
 
   afterEach(async () => {
-    fs.rmSync(tempDir, { recursive: true, force: true });
+    await fs.rm(tempDir, { recursive: true, force: true });
   });
 
   it("should initialize with a published module", async () => {
@@ -53,8 +53,8 @@ describe("Opentofu", () => {
     projectPath = path.join(tempDir, "test-project");
 
     // Create a simple project
-    fs.mkdirSync(projectPath, { recursive: true });
-    fs.writeFileSync(
+    await fs.mkdir(projectPath, { recursive: true });
+    await fs.writeFile(
       path.join(projectPath, "main.tf"),
       `module "example" {
         source  = "${config.api.host}/${namespace}/test-mod-${uniqueId}/generic"

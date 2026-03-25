@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, readdirSync } from "node:fs";
+import { access, readFile, readdir } from "node:fs/promises";
 import { join } from "node:path";
 import ignore from "ignore";
 import JSZip from "jszip";
@@ -71,7 +71,9 @@ export async function publish(
       throw new Error(`Invalid version name: ${version}`);
     }
 
-    if (!existsSync(path)) {
+    try {
+      await access(path);
+    } catch (_err) {
       throw new Error(`Module path does not exist: ${path}`);
     }
 
@@ -125,13 +127,12 @@ async function zipFolderToBuffer(sourceDir: string): Promise<Buffer> {
   let ignorePatterns: string[] = [];
   try {
     const gitignorePath = join(sourceDir, ".gitignore");
-    if (existsSync(gitignorePath)) {
-      const raw = readFileSync(gitignorePath, "utf8");
-      ignorePatterns = raw
-        .split(/\r?\n/)
-        .map((l) => l.trim())
-        .filter((l) => l !== "" && !l.startsWith("#"));
-    }
+    await access(gitignorePath);
+    const raw = await readFile(gitignorePath, "utf8");
+    ignorePatterns = raw
+      .split(/\r?\n/)
+      .map((l) => l.trim())
+      .filter((l) => l !== "" && !l.startsWith("#"));
     // Always ignore .git directory by default
     if (!ignorePatterns.includes(".git")) {
       ignorePatterns.push(".git");
@@ -158,8 +159,11 @@ async function zipFolderToBuffer(sourceDir: string): Promise<Buffer> {
     return matcher.ignores(normalized);
   };
 
-  const addFiles = (directory: string, relativePrefix = ""): void => {
-    const entries = readdirSync(directory, { withFileTypes: true });
+  const addFiles = async (
+    directory: string,
+    relativePrefix = "",
+  ): Promise<void> => {
+    const entries = await readdir(directory, { withFileTypes: true });
 
     for (const entry of entries) {
       const relativePath = relativePrefix
@@ -171,7 +175,7 @@ async function zipFolderToBuffer(sourceDir: string): Promise<Buffer> {
         if (shouldIgnore(relativePath, true)) {
           continue;
         }
-        addFiles(absolutePath, relativePath);
+        await addFiles(absolutePath, relativePath);
         continue;
       }
 
@@ -183,12 +187,12 @@ async function zipFolderToBuffer(sourceDir: string): Promise<Buffer> {
         continue;
       }
 
-      const fileContent = readFileSync(absolutePath);
+      const fileContent = await readFile(absolutePath);
       zip.file(relativePath, fileContent);
     }
   };
 
-  addFiles(sourceDir);
+  await addFiles(sourceDir);
 
   return await zip.generateAsync({
     type: "nodebuffer",
