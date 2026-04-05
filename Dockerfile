@@ -16,7 +16,7 @@ WORKDIR /usr/src/app
 
 # Install only production dependencies
 COPY package.json package-lock.json* ./
-RUN npm ci --only=production --silent && npm cache clean --force
+RUN npm ci --omit=dev --silent && npm cache clean --force
 
 # Copy compiled output and bin shims from builder
 COPY --from=builder /usr/src/app/dist ./dist
