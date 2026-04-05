@@ -17,6 +17,7 @@
     "unmold": "node ./bin/dev.js",
     "test:e2e": "npx dotenvx run -- node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON ./node_modules/mocha/bin/mocha --forbid-only \"tests/e2e/**/*.test.ts\"",
     "test:integration": "npx dotenvx run -- node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON ./node_modules/mocha/bin/mocha --forbid-only \"tests/integration/**/*.test.ts\"",
+    "test:docker": "docker build -t unmold-cli:latest . && docker run --rm unmold-cli:latest --help",
     "build": "tsc",
     "oclif": "oclif",
     "set-hooks": "npx simple-git-hooks",

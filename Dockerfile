@@ -8,11 +8,16 @@ RUN npm ci --silent
 
 # Copy source and build
 COPY . .
-RUN npm run build --silent
+RUN rm -f tsconfig.tsbuildinfo \
+  && npm run build --silent \
+  && test -d dist
 
 # Final stage: smaller runtime image with only production deps and compiled files
 FROM node:24-alpine
 WORKDIR /usr/src/app
+
+# Address potential vulnerabilities in base image before installing dependencies
+RUN apk update && apk upgrade --no-cache
 
 # Install only production dependencies
 COPY package.json package-lock.json* ./
