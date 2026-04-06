@@ -6,8 +6,10 @@ WORKDIR /usr/src/app
 COPY package.json package-lock.json* ./
 RUN npm ci --silent
 
-# Copy source and build
-COPY . .
+# Copy only files required to compile TypeScript and run oclif
+COPY tsconfig.json ./
+COPY src ./src
+COPY bin ./bin
 RUN rm -f tsconfig.tsbuildinfo \
   && npm run build --silent \
   && test -d dist
@@ -15,9 +17,6 @@ RUN rm -f tsconfig.tsbuildinfo \
 # Final stage: smaller runtime image with only production deps and compiled files
 FROM node:24-alpine
 WORKDIR /usr/src/app
-
-# Address potential vulnerabilities in base image before installing dependencies
-RUN apk update && apk upgrade --no-cache
 
 # Install only production dependencies
 COPY package.json package-lock.json* ./

@@ -13,6 +13,13 @@
   "license": "UNLICENSED",
   "author": "",
   "main": "index.js",
+  "files": [
+    "bin",
+    "dist/commands",
+    "dist/utils",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "unmold": "node ./bin/dev.js",
     "test:e2e": "npx dotenvx run -- node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON ./node_modules/mocha/bin/mocha --forbid-only \"tests/e2e/**/*.test.ts\"",
