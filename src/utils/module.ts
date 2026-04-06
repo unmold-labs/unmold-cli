@@ -25,6 +25,13 @@ export interface IModuleMetadata {
   system: string;
 }
 
+export interface IDeletedModule {
+  namespace: string;
+  name: string;
+  version: string;
+  system: string;
+}
+
 export async function list(filters: {
   namespace: string;
   name?: string;
@@ -113,6 +120,32 @@ export async function publish(
     console.error("Error during module publishing:", error);
     throw error;
   }
+}
+
+export async function deleteVersion(metadata: IModuleMetadata): Promise<{
+  deleted: IDeletedModule[];
+}> {
+  const { namespace, name, version, system } = metadata;
+
+  if (!isValidVersion(version)) {
+    throw new Error(`Invalid version name: ${version}`);
+  }
+
+  const result = await authenticatedRequest(
+    `/modules/v1/${namespace}/${name}/${system}/${version}`,
+    {
+      method: "DELETE",
+    },
+  );
+
+  if (!result.ok) {
+    const errorData = await result.json().catch(() => ({}));
+    throw new Error(
+      `Failed to delete module version: ${result.status} ${result.statusText} - ${JSON.stringify(errorData)}`,
+    );
+  }
+
+  return await result.json();
 }
 
 /**
