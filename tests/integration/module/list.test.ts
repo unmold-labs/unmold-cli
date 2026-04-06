@@ -1,5 +1,6 @@
 import { runCommand } from "@oclif/test";
 import { expect } from "chai";
+import { describe, it } from "mocha";
 import nock from "nock";
 
 import { config } from "../../test-helper";
