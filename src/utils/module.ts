@@ -32,6 +32,12 @@ export interface IDeletedModule {
   system: string;
 }
 
+export interface IModuleDeleteTarget {
+  namespace: string;
+  name: string;
+  system: string;
+}
+
 export async function list(filters: {
   namespace: string;
   name?: string;
@@ -142,6 +148,28 @@ export async function deleteVersion(metadata: IModuleMetadata): Promise<{
     const errorData = await result.json().catch(() => ({}));
     throw new Error(
       `Failed to delete module version: ${result.status} ${result.statusText} - ${JSON.stringify(errorData)}`,
+    );
+  }
+
+  return await result.json();
+}
+
+export async function deleteModule(target: IModuleDeleteTarget): Promise<{
+  deleted: IDeletedModule[];
+}> {
+  const { namespace, name, system } = target;
+
+  const result = await authenticatedRequest(
+    `/modules/v1/${namespace}/${name}/${system}`,
+    {
+      method: "DELETE",
+    },
+  );
+
+  if (!result.ok) {
+    const errorData = await result.json().catch(() => ({}));
+    throw new Error(
+      `Failed to delete module: ${result.status} ${result.statusText} - ${JSON.stringify(errorData)}`,
     );
   }
 
