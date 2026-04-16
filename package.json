@@ -17,6 +17,7 @@
     "bin",
     "dist/commands",
     "dist/utils",
+    "CHANGELOG.md",
     "README.md",
     "LICENSE"
   ],
