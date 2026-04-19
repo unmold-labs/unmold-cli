@@ -1,0 +1,12 @@
+# CI-friendly image derived from the standard Unmold CLI runtime image.
+# This keeps all CLI/runtime contents the same and only changes process startup.
+ARG BASE_IMAGE=quay.io/unmold/unmold-cli:latest
+FROM ${BASE_IMAGE}
+
+# Keep workspace semantics for CI checkouts.
+WORKDIR /workspace
+
+# Shell-first entrypoint so CI script lines run naturally.
+# The CLI remains available as the unmold command.
+ENTRYPOINT ["/bin/sh", "-lc"]
+CMD ["unmold --help"]
