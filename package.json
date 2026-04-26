@@ -14,6 +14,7 @@
   "author": "",
   "main": "index.js",
   "scripts": {
+    "unmold": "node ./bin/dev.js",
     "test:e2e": "npx dotenvx run -- mocha --forbid-only \"tests/e2e/**/*.test.ts\"",
     "test:integration": "npx dotenvx run -- mocha --forbid-only \"tests/integration/**/*.test.ts\"",
     "build": "tsc",
