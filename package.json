@@ -1,5 +1,5 @@
 {
-  "name": "unmold-cli",
+  "name": "@unmold/unmold-cli",
   "version": "0.1.0",
   "description": "Unmold CLI for registry automation",
   "homepage": "https://github.com/unmold-cloud/unmold-cli#readme",
@@ -10,7 +10,7 @@
     "type": "git",
     "url": "git+https://github.com/unmold-cloud/unmold-cli.git"
   },
-  "license": "ISC",
+  "license": "MIT",
   "author": "",
   "main": "index.js",
   "scripts": {
@@ -18,7 +18,9 @@
     "test:integration": "npx dotenvx run -- mocha --forbid-only \"tests/integration/**/*.test.ts\"",
     "build": "tsc",
     "oclif": "oclif",
-    "set-hooks": "npx simple-git-hooks"
+    "set-hooks": "npx simple-git-hooks",
+    "pack:macos": "oclif pack macos",
+    "pack:win": "oclif pack win"
   },
   "bin": {
     "unmold": "./bin/run.js"
@@ -32,14 +34,19 @@
       "@oclif/plugin-help",
       "@oclif/plugin-not-found",
       "@oclif/plugin-version",
+      "@oclif/plugin-update",
       "@oclif/plugin-warn-if-update-available"
-    ]
+    ],
+    "macos": {
+      "identifier": "com.unmold.cli"
+    }
   },
   "dependencies": {
     "@inquirer/prompts": "^7.8.2",
     "@oclif/core": "^4.4.0",
     "@oclif/plugin-help": "^6.2.29",
     "@oclif/plugin-not-found": "^3.2.57",
+    "@oclif/plugin-update": "^4.7.13",
     "@oclif/plugin-version": "^2.2.30",
     "@oclif/plugin-warn-if-update-available": "^3.1.42",
     "archiver": "^7.0.1"
