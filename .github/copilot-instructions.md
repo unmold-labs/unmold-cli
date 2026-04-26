@@ -7,7 +7,10 @@ Purpose: help AI coding agents be immediately productive in this repository.
 - Key files and examples to inspect:
   - Command pattern: [src/commands/module/publish.ts](src/commands/module/publish.ts#L1-L200) — shows `Command` subclass, `args`, `flags`, `this.parse()`, and `this.error()` usage.
   - HTTP + business logic: [src/utils/module.ts](src/utils/module.ts#L1-L200) — `publish()` and `list()` implementations, archiving with `archiver`, size checks, and `isValidVersion()` validation.
-  - Config + auth: [src/utils/config.ts](src/utils/config.ts#L1-L200) and [src/utils/auth.ts](src/utils/auth.ts#L1-L200) — environment-driven config and `UNMOLD_API_TOKEN` usage.
+  - Config + auth: [src/utils/config.ts](src/utils/config.ts#L1-L200) and [src/utils/auth.ts](src/utils/auth.ts#L1-L200) — environment-driven config and `UNMOLD_API_TOKEN` usage. Use `UNMOLD_API_URL` to override the API base URL for tests or custom environments.
+    - Auth storage: [src/utils/token.ts](src/utils/token.ts#L1-L200) — reads/writes the saved CLI token (supports `UNMOLD_CONFIG_PATH`).
+    - Login flow: [src/commands/login.ts](src/commands/login.ts#L1-L200) — browser-based OAuth, exchanges code at `/auth/v1/token`, saves token locally.
+    - Tokens are stored at `~/.unmold/config.json` by default. Set `UNMOLD_CONFIG_PATH` to override for tests or custom locations. `UNMOLD_API_TOKEN` always overrides the stored token.
   - CLI entrypoints: `bin/run.js` and `bin/dev.js` — how the packaged binary is wired.
   - Tests: [tests/integration/module/publish.test.ts](tests/integration/module/publish.test.ts#L1-L200) — shows test patterns: temporary dirs (`fs.mkdtempSync`), `nock` for API responses, and `runCommand` to invoke the CLI.
   - Project manifest: [package.json](package.json#L1-L200) — scripts: `build`, `test:integration`, `test:e2e`, `pack:macos`, `pack:win`.
@@ -23,6 +26,7 @@ Purpose: help AI coding agents be immediately productive in this repository.
   - Use `oclif` style commands: export a default `class extends Command`, declare `static args`, `static flags`, and call `this.parse()` early.
   - Use `this.log()` for stdout and `this.error(message, { exit: code })` for fatal errors (preserves oclif behavior seen in `publish.ts`).
   - Network requests should go through shared helpers (`authenticatedRequest` / `src/utils/index.ts`) so auth header and base host are consistent.
+    - Authenticated requests should rely on `unmold login` (saved token) or `UNMOLD_API_TOKEN` to populate `Authorization: Bearer`.
   - Validation: versions are expected to be URL-safe (see `isValidVersion()` in `src/utils/module.ts`). Use that helper logic instead of duplicating checks.
   - For file uploads: the code zips a directory with `archiver` and enforces `unmold.api.uploadSizeLimitMB` from config—respect that when adding features that change payload size.
 

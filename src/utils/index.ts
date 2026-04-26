@@ -3,7 +3,7 @@ import { unmold } from "./config";
 export function checkAuth(): void {
   if (!unmold.api.token) {
     throw new Error(
-      "Authentication token is missing. Please set the UNMOLD_API_TOKEN environment variable.",
+      "Authentication token is missing. Run 'unmold login' or set UNMOLD_API_TOKEN.",
     );
   }
 }
