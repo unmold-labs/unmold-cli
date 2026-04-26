@@ -1,8 +1,7 @@
-import archiver from "archiver";
 import { existsSync, readFileSync, readdirSync } from "node:fs";
-import { PassThrough } from "node:stream";
 import { join } from "node:path";
 import ignore from "ignore";
+import JSZip from "jszip";
 
 import { authenticatedRequest } from "../utils/index";
 import { unmold } from "../utils/config";
@@ -120,147 +119,81 @@ export async function publish(
  * @returns Promise that resolves to the zip file as a Buffer
  */
 async function zipFolderToBuffer(sourceDir: string): Promise<Buffer> {
-  return new Promise((resolve, reject) => {
-    const archive = archiver("zip", {
-      zlib: { level: 9 }, // Maximum compression
-    });
+  const zip = new JSZip();
 
-    const pass = new PassThrough();
-    const chunks: Buffer[] = [];
-    let settled = false;
+  // Build ignore patterns from .gitignore if present
+  let ignorePatterns: string[] = [];
+  try {
+    const gitignorePath = join(sourceDir, ".gitignore");
+    if (existsSync(gitignorePath)) {
+      const raw = readFileSync(gitignorePath, "utf8");
+      ignorePatterns = raw
+        .split(/\r?\n/)
+        .map((l) => l.trim())
+        .filter((l) => l !== "" && !l.startsWith("#"));
+    }
+    // Always ignore .git directory by default
+    if (!ignorePatterns.includes(".git")) {
+      ignorePatterns.push(".git");
+    }
+  } catch (_err) {
+    // if reading .gitignore fails, proceed without ignores
+  }
 
-    const fail = (err: Error): void => {
-      if (settled) {
-        return;
-      }
-      settled = true;
+  const matcher = ignore();
+  if (ignorePatterns.length > 0) {
+    matcher.add(ignorePatterns);
+  }
 
-      try {
-        archive.abort();
-      } catch (_err) {
-        // ignore abort errors
-      }
-
-      reject(err);
-    };
-
-    // Build ignore patterns from .gitignore if present
-    let ignorePatterns: string[] = [];
-    try {
-      const gitignorePath = join(sourceDir, ".gitignore");
-      if (existsSync(gitignorePath)) {
-        const raw = readFileSync(gitignorePath, "utf8");
-        ignorePatterns = raw
-          .split(/\r?\n/)
-          .map((l) => l.trim())
-          .filter((l) => l !== "" && !l.startsWith("#"));
-      }
-      // Always ignore .git directory by default
-      if (!ignorePatterns.includes(".git")) {
-        ignorePatterns.push(".git");
-      }
-    } catch (err) {
-      // if reading .gitignore fails, proceed without ignores
+  const shouldIgnore = (relativePath: string, isDirectory = false): boolean => {
+    const normalized = relativePath.replace(/\\/g, "/");
+    if (normalized.length === 0) {
+      return false;
     }
 
-    // Collect data from the passthrough stream
-    pass.on("data", (chunk: Buffer) => {
-      chunks.push(Buffer.from(chunk));
-    });
-
-    // Propagate stream errors to the promise rejection
-    pass.on("error", fail);
-
-    // Resolve when archive output has ended.
-    pass.on("end", () => {
-      if (settled) {
-        return;
-      }
-
-      settled = true;
-      resolve(Buffer.concat(chunks));
-    });
-
-    // Handle archive warnings (e.g., file stat failures) but continue when appropriate
-    archive.on("warning", (err: any) => {
-      // according to archiver docs, warning with code ENOENT can be ignored
-      if (err && err.code === "ENOENT") {
-        // log and continue
-        // eslint-disable-next-line no-console
-        console.warn("archiver warning:", err.message || err);
-        return;
-      }
-      fail(err instanceof Error ? err : new Error(String(err)));
-    });
-
-    archive.on("error", fail);
-
-    // Pipe archive output to passthrough and finalize
-    archive.pipe(pass);
-
-    // Add files explicitly instead of using glob, which avoids a Node v25
-    // warning path where internal file handles may be closed during GC.
-    const matcher = ignore();
-    if (ignorePatterns.length > 0) {
-      matcher.add(ignorePatterns);
+    if (isDirectory) {
+      return matcher.ignores(`${normalized}/`);
     }
 
-    const shouldIgnore = (
-      relativePath: string,
-      isDirectory = false,
-    ): boolean => {
-      const normalized = relativePath.replace(/\\/g, "/");
-      if (normalized.length === 0) {
-        return false;
-      }
+    return matcher.ignores(normalized);
+  };
 
-      if (isDirectory) {
-        return matcher.ignores(`${normalized}/`);
-      }
+  const addFiles = (directory: string, relativePrefix = ""): void => {
+    const entries = readdirSync(directory, { withFileTypes: true });
 
-      return matcher.ignores(normalized);
-    };
+    for (const entry of entries) {
+      const relativePath = relativePrefix
+        ? `${relativePrefix}/${entry.name}`
+        : entry.name;
+      const absolutePath = join(directory, entry.name);
 
-    const addFiles = (directory: string, relativePrefix = ""): void => {
-      const entries = readdirSync(directory, { withFileTypes: true });
-
-      for (const entry of entries) {
-        const relativePath = relativePrefix
-          ? `${relativePrefix}/${entry.name}`
-          : entry.name;
-        const absolutePath = join(directory, entry.name);
-
-        if (entry.isDirectory()) {
-          if (shouldIgnore(relativePath, true)) {
-            continue;
-          }
-          addFiles(absolutePath, relativePath);
+      if (entry.isDirectory()) {
+        if (shouldIgnore(relativePath, true)) {
           continue;
         }
-
-        if (!entry.isFile()) {
-          continue;
-        }
-
-        if (shouldIgnore(relativePath)) {
-          continue;
-        }
-
-        // Append file content directly to avoid archiver opening file handles
-        // that may be finalized by GC on newer Node versions.
-        const fileContent = readFileSync(absolutePath);
-        archive.append(fileContent, { name: relativePath });
+        addFiles(absolutePath, relativePath);
+        continue;
       }
-    };
 
-    addFiles(sourceDir);
+      if (!entry.isFile()) {
+        continue;
+      }
 
-    // Finalize the archive; errors will be emitted via 'error' or 'warning'
-    archive
-      .finalize()
-      .catch((err) =>
-        fail(err instanceof Error ? err : new Error(String(err))),
-      );
+      if (shouldIgnore(relativePath)) {
+        continue;
+      }
+
+      const fileContent = readFileSync(absolutePath);
+      zip.file(relativePath, fileContent);
+    }
+  };
+
+  addFiles(sourceDir);
+
+  return await zip.generateAsync({
+    type: "nodebuffer",
+    compression: "DEFLATE",
+    compressionOptions: { level: 9 },
   });
 }
 

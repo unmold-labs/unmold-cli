@@ -52,13 +52,12 @@
     "@oclif/plugin-update": "^4.7.22",
     "@oclif/plugin-version": "^2.2.30",
     "@oclif/plugin-warn-if-update-available": "^3.1.42",
-    "archiver": "^7.0.1",
-    "ignore": "^7.0.0"
+    "ignore": "^7.0.0",
+    "jszip": "^3.10.1"
   },
   "devDependencies": {
     "@dotenvx/dotenvx": "^1.51.0",
     "@oclif/test": "^4.1.13",
-    "@types/archiver": "^6.0.3",
     "@types/chai": "^5.2.2",
     "@types/mocha": "^10.0.10",
     "@types/node": "^18.19.113",
