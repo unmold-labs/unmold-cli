@@ -75,6 +75,19 @@ unmold module list my-namespace/my-module
 unmold module list my-namespace/my-module/aws
 ```
 
+Delete a module version
+
+```bash
+# delete a version for current user's namespace
+unmold module delete-version my-module 1.0.0
+
+# delete a version for a specific system
+unmold module delete-version my-module 1.0.0 --system aws
+
+# skip interactive confirmation prompt
+unmold module delete-version my-module 1.0.0 --confirm
+```
+
 For more documentation and examples, see https://unmold.dev.
 
 ## Contributing
