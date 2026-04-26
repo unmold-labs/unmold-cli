@@ -20,6 +20,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Run integration tests
+        env:
+          UNMOLD_API_TOKEN: ${{ secrets.UNMOLD_API_TOKEN }}
         run: npm run test:integration
 
   test-e2e:
