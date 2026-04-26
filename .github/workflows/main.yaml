@@ -21,5 +21,9 @@ jobs:
         run: npm ci
       - name: Run integration tests
         run: npm run test:integration
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+      - name: Setup OpenTofu
+        uses: opentofu/setup-opentofu@v1
       - name: Run e2e tests
         run: npm run test:e2e
