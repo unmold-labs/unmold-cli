@@ -58,6 +58,7 @@
     "ts-node": "^10.9.2"
   },
   "simple-git-hooks": {
-    "pre-commit": "yarn pretty-quick --staged"
+    "pre-commit": "npx pretty-quick --staged",
+    "pre-push": "npm run test:integration"
   }
 }
