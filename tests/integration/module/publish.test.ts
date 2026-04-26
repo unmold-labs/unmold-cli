@@ -38,11 +38,13 @@ describe("publish", () => {
     const { stdout, stderr } = await runCommand([
       "module",
       "publish",
-      "unmold-test/test-mod/terraform",
+      "unmold-test/test-mod",
       "1.0.0",
       "-y",
       "--path",
       modulePath,
+      "--system",
+      "terraform",
     ]);
 
     expect(stderr).to.be.empty;

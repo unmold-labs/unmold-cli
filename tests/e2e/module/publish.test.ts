@@ -72,9 +72,11 @@ describe("publish", () => {
     const { stdout, stderr } = await runCommand([
       "module",
       "publish",
-      `${namespace}/publish-test-custom-system/custom`,
+      `${namespace}/publish-test-custom-system`,
       version,
       "-y",
+      "--system",
+      "custom",
       "--path",
       modulePath,
     ]);
