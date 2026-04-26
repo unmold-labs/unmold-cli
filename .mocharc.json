@@ -1,7 +1,7 @@
 {
-    "extension": ["ts"],
-    "require": ["ts-node/register", "./test/test-helper.ts"],
-    "timeout": 10000,
-    "recursive": true,
-    "exit": true
-  }
+  "extension": ["ts"],
+  "require": ["ts-node/register", "./tests/test-helper.ts"],
+  "timeout": 10000,
+  "recursive": true,
+  "exit": true
+}
