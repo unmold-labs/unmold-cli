@@ -1,6 +1,7 @@
 import archiver from "archiver";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { PassThrough } from "node:stream";
+import { join } from "node:path";
 
 import { authenticatedRequest } from "../utils/index";
 import { unmold } from "../utils/config";
@@ -126,6 +127,25 @@ async function zipFolderToBuffer(sourceDir: string): Promise<Buffer> {
     const pass = new PassThrough();
     const chunks: Buffer[] = [];
 
+    // Build ignore patterns from .gitignore if present
+    let ignorePatterns: string[] = [];
+    try {
+      const gitignorePath = join(sourceDir, ".gitignore");
+      if (existsSync(gitignorePath)) {
+        const raw = readFileSync(gitignorePath, "utf8");
+        ignorePatterns = raw
+          .split(/\r?\n/)
+          .map((l) => l.trim())
+          .filter((l) => l !== "" && !l.startsWith("#"));
+      }
+      // Always ignore .git directory by default
+      if (!ignorePatterns.includes(".git")) {
+        ignorePatterns.push(".git");
+      }
+    } catch (err) {
+      // if reading .gitignore fails, proceed without ignores
+    }
+
     // Collect data from the passthrough stream
     pass.on("data", (chunk: Buffer) => {
       chunks.push(Buffer.from(chunk));
@@ -165,8 +185,9 @@ async function zipFolderToBuffer(sourceDir: string): Promise<Buffer> {
     // Pipe archive output to passthrough and finalize
     archive.pipe(pass);
 
-    // Add all files in the directory to the archive
-    archive.directory(sourceDir, false);
+    // Add all files in the directory while respecting .gitignore patterns
+    // Use glob with ignore patterns so that unwanted files are excluded
+    archive.glob("**/*", { cwd: sourceDir, dot: true, ignore: ignorePatterns });
 
     // Finalize the archive; errors will be emitted via 'error' or 'warning'
     archive.finalize().catch((err) => reject(err));
