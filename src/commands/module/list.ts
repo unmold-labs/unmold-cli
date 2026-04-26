@@ -1,27 +1,48 @@
-import {Args, Command, Flags} from '@oclif/core'
+import { Args, Command, Flags } from '@oclif/core';
+import { list } from '../../utils/module';
 
 export default class ModuleList extends Command {
-  static override args = {
-    file: Args.string({description: 'file to read'}),
-  }
-  static override description = 'describe the command here'
+  static override description = 'List available versions of a module';
+  
   static override examples = [
-    '<%= config.bin %> <%= command.id %>',
-  ]
+    '<%= config.bin %> <%= command.id %> my-namespace my-module',
+    '<%= config.bin %> <%= command.id %> my-namespace my-module --system aws',
+  ];
+
+  static override args = {
+    namespace: Args.string({
+      description: 'Namespace of the module',
+      required: true,
+    }),
+    name: Args.string({
+      description: 'Name of the module',
+      required: true,
+    }),
+  };
+
   static override flags = {
-    // flag with no value (-f, --force)
-    force: Flags.boolean({char: 'f'}),
-    // flag with a value (-n, --name=VALUE)
-    name: Flags.string({char: 'n', description: 'name to print'}),
-  }
+    system: Flags.string({
+      char: 's',
+      description: 'Target system (default: generic)',
+      default: 'generic',
+    }),
+    help: Flags.help({ char: 'h' }),
+  };
 
   public async run(): Promise<void> {
-    const {args, flags} = await this.parse(ModuleList)
+    const { args, flags } = await this.parse(ModuleList);
 
-    const name = flags.name ?? 'world'
-    this.log(`hello ${name} from /Users/haol9418/Documents/Repositories/unmold-cli/src/commands/module/list.ts`)
-    if (args.file && flags.force) {
-      this.log(`you input --force and --file: ${args.file}`)
+    try {
+      const modules = await list({
+        namespace: args.namespace,
+        name: args.name,
+        system: flags.system,
+      });
+
+      // Output the result as JSON
+      this.log(JSON.stringify(modules, null, 2));
+    } catch (error) {
+      this.error(`Failed to list module versions: ${error.message}`, { exit: 1 });
     }
   }
 }
