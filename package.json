@@ -25,10 +25,20 @@
     "bin": "unmold",
     "commands": "./dist/commands",
     "dirname": "unmold",
-    "topicSeparator": " "
+    "topicSeparator": " ",
+    "plugins": [
+      "@oclif/plugin-help",
+      "@oclif/plugin-not-found",
+      "@oclif/plugin-version",
+      "@oclif/plugin-warn-if-update-available"
+    ]
   },
   "dependencies": {
-    "@oclif/core": "^4.4.0"
+    "@oclif/core": "^4.4.0",
+    "@oclif/plugin-help": "^6.2.29",
+    "@oclif/plugin-not-found": "^3.2.57",
+    "@oclif/plugin-version": "^2.2.30",
+    "@oclif/plugin-warn-if-update-available": "^3.1.42"
   },
   "devDependencies": {
     "@types/node": "^18.19.113",
