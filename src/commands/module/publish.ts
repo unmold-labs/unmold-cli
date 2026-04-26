@@ -1,7 +1,8 @@
 import { Args, Command, Flags } from "@oclif/core";
 import { confirm } from "@inquirer/prompts";
 
-import { publish, IModuleMetadata, parseIdentifier } from "../../utils/module";
+import { publish, IModuleMetadata } from "../../utils/module";
+import { getUserProfile } from "../../utils/auth";
 import { resolve } from "path";
 
 export default class ModulePublish extends Command {
@@ -10,13 +11,14 @@ export default class ModulePublish extends Command {
   static override examples = [
     "<%= config.bin %> <%= command.id %> mymodule 1.0.0",
     "<%= config.bin %> <%= command.id %> myorg/mymodule 1.0.0",
-    "<%= config.bin %> <%= command.id %> myorg/mymodule/aws 1.0.0 --path ./my-module",
+    "<%= config.bin %> <%= command.id %> myorg/mymodule/aws 1.0.0",
+    "<%= config.bin %> <%= command.id %> myorg/mymodule/aws 1.0.0 --path ./module-dir",
   ];
 
   static override args = {
-    identifier: Args.string({
-      name: "identifier",
-      description: "Module identifiers (namespsace/name/system)",
+    identifiers: Args.string({
+      name: "identifiers",
+      description: "Module identifiers (namespace/name/system)",
       required: true,
     }),
     version: Args.string({
@@ -43,13 +45,19 @@ export default class ModulePublish extends Command {
     const { args, flags } = await this.parse(ModulePublish);
 
     try {
-      const moduleId = parseIdentifier(args.identifier);
       const modulePath = resolve(flags.path);
 
+      let { namespace, name, system } = this.parseIdentifiers(args.identifiers);
+
+      if (!namespace) {
+        const userProfile = await getUserProfile();
+        namespace = userProfile.name;
+      }
+
       const metadata: IModuleMetadata = {
-        namespace: moduleId.namespace,
-        name: moduleId.name,
-        system: moduleId.system,
+        namespace,
+        name,
+        system,
         version: args.version,
       };
 
@@ -78,5 +86,28 @@ export default class ModulePublish extends Command {
         });
       }
     }
+  }
+
+  private parseIdentifiers(identifiers: string): {
+    namespace?: string;
+    name: string;
+    system: string;
+  } {
+    const parts = identifiers.split("/");
+
+    if (parts.length === 3) {
+      const [namespace, name, system] = parts;
+      return { namespace, name, system };
+    } else if (parts.length === 2) {
+      const [namespace, name] = parts;
+      return { namespace, name, system: "generic" };
+    } else if (parts.length === 1) {
+      const name = parts[0];
+      return { name, system: "generic" };
+    }
+
+    throw new Error(
+      `Invalid module identifier format: ${identifiers}. Expected format: [namespace]/name/[system]`,
+    );
   }
 }

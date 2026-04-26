@@ -19,5 +19,5 @@ export function authenticatedRequest(
     Authorization: `Bearer ${unmold.api.token}`,
   };
 
-  return fetch(`${unmold.api.url}/${path}`, { ...options, headers });
+  return fetch(`${unmold.api.url}${path}`, { ...options, headers });
 }

@@ -74,6 +74,34 @@ describe("publish", () => {
     scope.done();
   });
 
+  it("should use username as namespace when not provided", async () => {
+    const scope = nock(`https://${config.api.host}`)
+      .post("/modules/v1/unmold-test/test-mod/generic/1.0.0")
+      .reply(200, { success: true })
+      .get("/users/v1/current")
+      .reply(200, {
+        username: "unmold-test",
+        email: "unmold-test@example.com",
+      });
+
+    const { stdout, stderr } = await runCommand([
+      "module",
+      "publish",
+      "test-mod",
+      "1.0.0",
+      "-y",
+      "--path",
+      modulePath,
+    ]);
+
+    expect(stderr).to.be.empty;
+    expect(stdout).to.include(
+      "Successfully published unmold-test/test-mod/generic@1.0.0",
+    );
+
+    scope.done();
+  });
+
   it.skip("should fail when module is too large", async () => {
     // This test is skipped because it requires mocking the file system
     // which is better handled in unit tests
