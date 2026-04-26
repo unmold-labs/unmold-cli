@@ -1,5 +1,6 @@
 import archiver from "archiver";
 import { existsSync } from "node:fs";
+import { PassThrough } from "node:stream";
 
 import { authenticatedRequest } from "../utils/index";
 import { unmold } from "../utils/config";
@@ -115,26 +116,53 @@ async function zipFolderToBuffer(sourceDir: string): Promise<Buffer> {
       zlib: { level: 9 }, // Maximum compression
     });
 
-    const buffers: Buffer[] = [];
+    const pass = new PassThrough();
+    const chunks: Buffer[] = [];
 
-    archive.on("data", (data: Buffer) => {
-      buffers.push(data);
+    // Collect data from the passthrough stream
+    pass.on("data", (chunk: Buffer) => {
+      chunks.push(Buffer.from(chunk));
+    });
+
+    // Resolve when the passthrough ends
+    pass.on("end", () => {
+      try {
+        const buffer = Buffer.concat(chunks);
+        resolve(buffer);
+      } finally {
+        // Best-effort cleanup
+        try {
+          archive.destroy();
+        } catch (_e) {
+          // ignore
+        }
+      }
+    });
+
+    // Handle archive warnings (e.g., file stat failures) but continue when appropriate
+    archive.on("warning", (err: any) => {
+      // according to archiver docs, warning with code ENOENT can be ignored
+      if (err && err.code === "ENOENT") {
+        // log and continue
+        // eslint-disable-next-line no-console
+        console.warn("archiver warning:", err.message || err);
+        return;
+      }
+      reject(err);
     });
 
     archive.on("error", (err: Error) => {
       reject(err);
     });
 
-    archive.on("end", () => {
-      const buffer = Buffer.concat(buffers);
-      resolve(buffer);
-    });
+    // Pipe archive output to passthrough and finalize
+    archive.pipe(pass);
 
     // Add all files in the directory to the archive
     archive.directory(sourceDir, false);
 
-    // Finalize the archive
-    archive.finalize();
+    // Finalize the archive; errors will be emitted via 'error' or 'warning'
+    archive.finalize().catch((err) => reject(err));
   });
 }
 
