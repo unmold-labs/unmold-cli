@@ -57,7 +57,11 @@ export async function list(filters: {
   }));
 }
 
-export async function publish(path: string, metadata: IModuleMetadata) {
+export async function publish(
+  path: string,
+  metadata: IModuleMetadata,
+  overwrite = false,
+) {
   const { namespace, name, version, system } = metadata;
   const MAX_MODULE_SIZE = unmold.api.uploadSizeLimitMB * 1024 * 1024; // 20MB in bytes
 
@@ -80,16 +84,19 @@ export async function publish(path: string, metadata: IModuleMetadata) {
       );
     }
 
-    const result = await authenticatedRequest(
-      `/modules/v1/${namespace}/${name}/${system}/${version}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/zip",
-        },
-        body: new Uint8Array(zipBuffer),
+    let url = `/modules/v1/${namespace}/${name}/${system}/${version}`;
+
+    if (overwrite) {
+      url += "?overwrite=true";
+    }
+
+    const result = await authenticatedRequest(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/zip",
       },
-    );
+      body: new Uint8Array(zipBuffer),
+    });
 
     if (!result.ok) {
       const errorData = await result.json().catch(() => ({}));
