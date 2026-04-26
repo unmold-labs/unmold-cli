@@ -35,6 +35,7 @@
     ]
   },
   "dependencies": {
+    "@inquirer/prompts": "^7.8.2",
     "@oclif/core": "^4.4.0",
     "@oclif/plugin-help": "^6.2.29",
     "@oclif/plugin-not-found": "^3.2.57",
@@ -45,11 +46,11 @@
   },
   "devDependencies": {
     "@oclif/test": "^4.1.13",
+    "@types/archiver": "^6.0.3",
     "@types/chai": "^5.2.2",
     "@types/mocha": "^10.0.10",
     "@types/node": "^18.19.113",
     "@types/node-fetch": "^2.6.12",
-    "@types/archiver": "^6.0.3",
     "@types/semver": "^7.7.0",
     "chai": "^5.2.0",
     "mocha": "^11.7.1",

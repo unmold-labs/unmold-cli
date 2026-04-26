@@ -1,42 +1,33 @@
-import { Args, Command, Flags } from '@oclif/core';
-import { list } from '../../utils/module';
+import { Args, Command } from "@oclif/core";
+
+import { list, parseIdentifier } from "../../utils/module";
 
 export default class ModuleList extends Command {
-  static override description = 'List available versions of a module';
-  
+  static override description = "List available versions of a module";
+
   static override examples = [
-    '<%= config.bin %> <%= command.id %> my-namespace my-module',
-    '<%= config.bin %> <%= command.id %> my-namespace my-module --system aws',
+    "<%= config.bin %> <%= command.id %> my-namespace/my-module",
+    "<%= config.bin %> <%= command.id %> my-namespace/my-module/aws",
   ];
 
   static override args = {
-    namespace: Args.string({
-      description: 'Namespace of the module',
-      required: true,
-    }),
-    name: Args.string({
-      description: 'Name of the module',
+    identifier: Args.string({
+      description: "Module identifier components (namespace/name/system)",
       required: true,
     }),
   };
 
-  static override flags = {
-    system: Flags.string({
-      char: 's',
-      description: 'Target system (default: generic)',
-      default: 'generic',
-    }),
-    help: Flags.help({ char: 'h' }),
-  };
+  static override flags = {};
 
   public async run(): Promise<void> {
     const { args, flags } = await this.parse(ModuleList);
+    const moduleId = parseIdentifier(args.identifier);
 
     try {
       const modules = await list({
-        namespace: args.namespace,
-        name: args.name,
-        system: flags.system,
+        namespace: moduleId.namespace,
+        name: moduleId.name,
+        system: moduleId.system,
       });
 
       // Output the result as JSON
