@@ -48,6 +48,10 @@ describe("list", () => {
 
     const { stdout, stderr } = await runCommand(["module", "list", namespace]);
 
+    if (stderr) {
+      console.error("Error output:", stderr);
+    }
+
     expect(stderr).to.be.empty;
     expect(JSON.parse(stdout).length).to.be.greaterThan(0);
   });
@@ -72,6 +76,10 @@ describe("list", () => {
       "list",
       `${namespace}/${moduleName}`,
     ]);
+
+    if (stderr) {
+      console.error("Error output:", stderr);
+    }
 
     expect(stderr).to.be.empty;
     expect(JSON.parse(stdout)).to.deep.equal([
@@ -100,11 +108,17 @@ describe("list", () => {
     ]);
     expect(publishError).to.be.empty;
 
-    const { stdout } = await runCommand([
+    const { stdout, stderr } = await runCommand([
       "module",
       "list",
       `${namespace}/${moduleName}/aws`,
     ]);
+
+    if (stderr) {
+      console.error("Error output:", stderr);
+    }
+
+    expect(stderr).to.be.empty;
     expect(JSON.parse(stdout)).to.deep.equal([
       {
         namespace,
