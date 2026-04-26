@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { execa } from "execa";
 import fetch from "node-fetch";
-import * as fs from "node:fs";
+import * as fs from "node:fs/promises";
 import * as os from "node:os";
 import * as path from "node:path";
 import { createServer } from "node:http";
@@ -13,12 +13,12 @@ describe("login", () => {
   let tokenBaseUrl = "";
 
   beforeEach(async () => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "unmold-login-"));
+    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "unmold-login-"));
     configPath = path.join(tempDir, "config.json");
   });
 
   afterEach(async () => {
-    fs.rmSync(tempDir, { recursive: true, force: true });
+    await fs.rm(tempDir, { recursive: true, force: true });
     if (tokenServer) {
       tokenServer.close();
       tokenServer = undefined;
@@ -59,12 +59,12 @@ describe("login", () => {
     expect(stderr).to.equal("");
     expect(stdout).to.include("Login successful");
 
-    const saved = JSON.parse(fs.readFileSync(configPath, "utf8"));
+    const saved = JSON.parse(await fs.readFile(configPath, "utf8"));
     expect(saved.token).to.equal("token-123");
   });
 
   it("asks the user to logout when local auth already exists", async () => {
-    fs.writeFileSync(
+    await fs.writeFile(
       configPath,
       JSON.stringify({ token: "existing-token" }),
       "utf8",

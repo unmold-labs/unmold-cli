@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import { execa } from "execa";
-import * as fs from "node:fs";
+import * as fs from "node:fs/promises";
 import * as os from "node:os";
 import * as path from "node:path";
 
@@ -9,16 +9,16 @@ describe("logout", () => {
   let configPath: string;
 
   beforeEach(async () => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "unmold-logout-"));
+    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "unmold-logout-"));
     configPath = path.join(tempDir, "config.json");
   });
 
   afterEach(async () => {
-    fs.rmSync(tempDir, { recursive: true, force: true });
+    await fs.rm(tempDir, { recursive: true, force: true });
   });
 
   it("removes the locally stored token", async () => {
-    fs.writeFileSync(
+    await fs.writeFile(
       configPath,
       JSON.stringify({ token: "token-123", savedAt: new Date().toISOString() }),
       "utf8",
@@ -34,7 +34,11 @@ describe("logout", () => {
 
     expect(stderr).to.equal("");
     expect(stdout).to.include("Logged out. Removed token");
-    expect(fs.existsSync(configPath)).to.equal(false);
+    const configExists = await fs
+      .access(configPath)
+      .then(() => true)
+      .catch(() => false);
+    expect(configExists).to.equal(false);
   });
 
   it("prints a helpful message when there is no local token", async () => {

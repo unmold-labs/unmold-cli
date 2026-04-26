@@ -1,4 +1,3 @@
-import { existsSync, readFileSync } from "node:fs";
 import { access, mkdir, rm, writeFile, readFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { homedir } from "node:os";
@@ -12,25 +11,6 @@ export function getConfigPath(): string {
   return (
     process.env.UNMOLD_CONFIG_PATH || join(homedir(), ".unmold", "config.json")
   );
-}
-
-export function readStoredTokenSync(): string {
-  const configPath = getConfigPath();
-  if (!existsSync(configPath)) {
-    return "";
-  }
-
-  try {
-    const raw = readFileSync(configPath, "utf8");
-    const parsed = JSON.parse(raw) as TokenStore;
-    if (parsed && typeof parsed.token === "string") {
-      return parsed.token;
-    }
-  } catch (_err) {
-    // ignore malformed token files
-  }
-
-  return "";
 }
 
 export async function readStoredToken(): Promise<string> {
