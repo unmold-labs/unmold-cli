@@ -4,7 +4,6 @@ import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
 
-// @ts-ignore
 import { randomSemver } from "../../test-helper";
 
 describe("publish", () => {
@@ -29,12 +28,12 @@ describe("publish", () => {
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
 
-  it("should print module versions with the default system name", async () => {
+  it("should publish a module with the default system name", async () => {
     const version = randomSemver();
     const { stdout, stderr } = await runCommand([
       "module",
       "publish",
-      "test-ns/test-mod",
+      "unmold-test/test-mod",
       version,
       "-y",
       "--path",
@@ -43,16 +42,16 @@ describe("publish", () => {
 
     expect(stderr).to.be.empty;
     expect(stdout).to.include(
-      `Successfully published test-ns/test-mod/generic@${version}`,
+      `Successfully published unmold-test/test-mod/generic@${version}`,
     );
   });
 
-  it("should print module versions with the specified system name", async () => {
+  it("should publish a module with the specified system name", async () => {
     const version = randomSemver();
     const { stdout, stderr } = await runCommand([
       "module",
       "publish",
-      "test-ns/test-mod/test-system",
+      "unmold-test/test-mod/test-system",
       version,
       "-y",
       "--path",
@@ -61,7 +60,7 @@ describe("publish", () => {
 
     expect(stderr).to.be.empty;
     expect(stdout).to.include(
-      `Successfully published test-ns/test-mod/test-system@${version}`,
+      `Successfully published unmold-test/test-mod/test-system@${version}`,
     );
   });
 });

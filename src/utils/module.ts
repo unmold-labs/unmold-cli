@@ -1,4 +1,5 @@
 import archiver from "archiver";
+import { existsSync } from "node:fs";
 
 import { unmold } from "../utils/config";
 
@@ -55,6 +56,10 @@ export async function publish(path: string, metadata: IModuleMetadata) {
   try {
     if (!isValidVersion(version)) {
       throw new Error(`Invalid version name: ${version}`);
+    }
+
+    if (!existsSync(path)) {
+      throw new Error(`Module path does not exist: ${path}`);
     }
 
     // Zip the folder and get it as a buffer
