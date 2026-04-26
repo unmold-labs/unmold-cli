@@ -30,6 +30,8 @@ jobs:
         env:
           UNMOLD_API_TOKEN: ${{ secrets.UNMOLD_API_TOKEN }}
         run: npm run test:integration
+      - name: Run Docker build test
+        run: npm run test:docker
 
   test-e2e:
     if: github.event_name != 'pull_request'
