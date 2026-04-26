@@ -88,7 +88,6 @@ unmold module delete-version my-module 1.0.0 --system aws
 unmold module delete-version my-module 1.0.0 --confirm
 ```
 
-<<<<<<< HEAD
 Delete a module
 
 ```bash
@@ -102,11 +101,7 @@ unmold module delete my-module --system aws
 unmold module delete my-module --confirm
 ```
 
-# For more documentation and examples, see https://docs.unmold.dev.
-
-For more documentation and examples, see https://unmold.dev.
-
-> > > > > > > c77cd8e9838e2f049d4019d37c845134bd9d5004
+For more documentation and examples, see https://docs.unmold.dev.
 
 ## Contributing
 
