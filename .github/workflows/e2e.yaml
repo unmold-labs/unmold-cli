@@ -1,10 +1,10 @@
-name: main
+name: e2e
 
 on:
-  push:
-    branches:
-      - main
+  workflow_call:
   workflow_dispatch: # This makes the workflow manually triggerable
+  schedule:
+    - cron: "21 3 * * *" # Runs at 3:21 AM everyday
 
 jobs:
   test:
@@ -19,10 +19,9 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm ci
-      - name: Run integration tests
-        run: npm run test:integration
-
-  test-e2e:
-    needs: test
-    uses: ./.github/workflows/e2e.yaml
-    secrets: inherit
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+      - name: Setup OpenTofu
+        uses: opentofu/setup-opentofu@v1
+      - name: Run e2e tests
+        run: npm run test:e2e
