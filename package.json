@@ -1,5 +1,5 @@
 {
-  "name": "@unmold/unmold-cli",
+  "name": "@unmold/cli",
   "version": "0.1.0",
   "description": "Unmold CLI for registry automation",
   "homepage": "https://github.com/unmold-cloud/unmold-cli#readme",
@@ -10,7 +10,7 @@
     "type": "git",
     "url": "git+https://github.com/unmold-cloud/unmold-cli.git"
   },
-  "license": "MIT",
+  "license": "UNLICENSED",
   "author": "",
   "main": "index.js",
   "scripts": {
@@ -78,5 +78,8 @@
   "simple-git-hooks": {
     "pre-commit": "npx pretty-quick --staged",
     "pre-push": "npm run test:integration"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
