@@ -31,7 +31,32 @@ describe("list", () => {
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
 
-  it("should print module versions with the default system name", async () => {
+  it("should list modules with a given namespace", async () => {
+    const uniqueId = uuid();
+    const moduleName = `list-test-default-system-${uniqueId}`;
+
+    const { stderr: publishError } = await runCommand([
+      "module",
+      "publish",
+      `${namespace}/${moduleName}`,
+      "1.0.0",
+      "-y",
+      "--path",
+      modulePath,
+    ]);
+    expect(publishError).to.be.empty;
+
+    const { stdout, stderr } = await runCommand([
+      "module",
+      "list",
+      `${namespace}`,
+    ]);
+
+    expect(stderr).to.be.empty;
+    expect(JSON.parse(stdout).length).to.be.greaterThan(0);
+  });
+
+  it("should list modules with a given name", async () => {
     const uniqueId = uuid();
     const moduleName = `list-test-default-system-${uniqueId}`;
 
@@ -63,7 +88,7 @@ describe("list", () => {
     ]);
   });
 
-  it("should print module versions with the specified system name", async () => {
+  it("should list modules with a given system name", async () => {
     const uniqueId = uuid();
     const moduleName = `list-test-custom-system-${uniqueId}`;
     const { stderr: publishError } = await runCommand([

@@ -1,18 +1,20 @@
 import { Args, Command } from "@oclif/core";
 
-import { list, parseIdentifier } from "../../utils/module";
+import { list } from "../../utils/module";
 
 export default class ModuleList extends Command {
-  static override description = "List available versions of a module";
+  static override description =
+    "List available modules and their versions with filters.";
 
   static override examples = [
-    "<%= config.bin %> <%= command.id %> my-namespace/my-module",
-    "<%= config.bin %> <%= command.id %> my-namespace/my-module/aws",
+    "<%= config.bin %> <%= command.id %> namespace",
+    "<%= config.bin %> <%= command.id %> namespace/name",
+    "<%= config.bin %> <%= command.id %> namespace/name/system",
   ];
 
   static override args = {
-    identifier: Args.string({
-      description: "Module identifier components (namespace/name/system)",
+    filters: Args.string({
+      description: "Module filters (namespace/name/system)",
       required: true,
     }),
   };
@@ -20,14 +22,14 @@ export default class ModuleList extends Command {
   static override flags = {};
 
   public async run(): Promise<void> {
-    const { args, flags } = await this.parse(ModuleList);
-    const moduleId = parseIdentifier(args.identifier);
+    const { args } = await this.parse(ModuleList);
+    const [namespace, name, system] = args.filters.split("/");
 
     try {
       const modules = await list({
-        namespace: moduleId.namespace,
-        name: moduleId.name,
-        system: moduleId.system,
+        namespace,
+        name,
+        system,
       });
 
       // Output the result as JSON

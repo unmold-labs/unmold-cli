@@ -23,27 +23,35 @@ export interface IModuleMetadata {
   system: string;
 }
 
-export async function list(params: {
+export async function list(filters: {
   namespace: string;
-  name: string;
+  name?: string;
   system?: string;
 }): Promise<IModuleMetadata[]> {
-  const { namespace, name, system = "generic" } = params;
-  const result = await authenticatedRequest(
-    `modules/v1/${namespace}/${name}/${system}/versions`,
-  );
+  const { namespace, name, system } = filters;
+
+  let path = `${namespace}`;
+
+  if (name) {
+    path += `/${name}`;
+  }
+
+  if (system) {
+    path += `/${system}`;
+  }
+
+  const result = await authenticatedRequest(`modules/v1/${path}`);
 
   if (!result.ok) {
     throw new Error(`Failed to list module versions: ${result.statusText}`);
   }
 
-  const data: any = await result.json();
-  const versions = data.modules[0].versions;
+  const results: any = await result.json();
 
-  return versions.map((data: any) => ({
-    namespace,
-    name,
-    system,
+  return results.map((data: any) => ({
+    namespace: data.namespace,
+    name: data.name,
+    system: data.system,
     version: data.version,
   }));
 }
