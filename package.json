@@ -1,0 +1,38 @@
+{
+  "name": "unmold-cli",
+  "version": "0.1.0",
+  "description": "Unmold CLI for registry automation",
+  "homepage": "https://github.com/unmold-cloud/unmold-cli#readme",
+  "bugs": {
+    "url": "https://github.com/unmold-cloud/unmold-cli/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/unmold-cloud/unmold-cli.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "oclif": "oclif"
+  },
+  "bin": {
+    "unmold": "./bin/run.js"
+  },
+  "oclif": {
+    "bin": "unmold",
+    "commands": "./dist/commands",
+    "dirname": "unmold",
+    "topicSeparator": " "
+  },
+  "dependencies": {
+    "@oclif/core": "^4.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "^18.19.113",
+    "oclif": "^4.20.1",
+    "ts-node": "^10.9.2"
+  }
+}
