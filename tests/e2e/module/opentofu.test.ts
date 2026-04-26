@@ -16,7 +16,7 @@ describe("Opentofu", () => {
   let modulePath: string;
   let projectPath: string;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     // Create a temporary directory for testing
     tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "unmold-test-"));
     modulePath = path.join(tempDir, "test-module");
@@ -29,7 +29,7 @@ describe("Opentofu", () => {
     );
   });
 
-  afterEach(() => {
+  afterEach(async () => {
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
 
