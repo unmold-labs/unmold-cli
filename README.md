@@ -9,7 +9,7 @@ Official CLI for interacting with [unmold.dev](https://unmold.dev).
 Install as npm global dependency
 
 ```bash
-npm install -g @unmold/unmold-cli
+npm install -g @unmold/cli
 ```
 
 ### docker
@@ -17,7 +17,7 @@ npm install -g @unmold/unmold-cli
 Run with container without installation
 
 ```bash
-docker run unmold/unmold-cli version
+docker run quay.io/unmold/unmold-cli:latest version
 ```
 
 ## Authentication
