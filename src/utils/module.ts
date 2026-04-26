@@ -28,7 +28,12 @@ export const list = async (params: {
 }): Promise<IModuleMetadata[]> => {
     const { namespace, name, system = 'generic'} = params;   
     const result = await fetch(`${api.url}/v1/modules/${namespace}/${name}/${system}/versions`);
-    const data = await result.json();
+
+    if (!result.ok) {
+      throw new Error(`Failed to list module versions: ${result.statusText}`);
+    }
+
+    const data: any = await result.json();
     const versions = data.modules[0].versions
 
     return versions.map((data: any) => ({
