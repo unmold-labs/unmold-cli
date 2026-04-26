@@ -22,13 +22,27 @@ docker run unmold/unmold-cli version
 
 ## Authentication
 
-Create an API token in the Unmold Console and export it as an environment variable:
+Authenticate with the browser-based login flow:
+
+```bash
+unmold login
+```
+
+This stores your token in `~/.unmold/config.json` (or `UNMOLD_CONFIG_PATH` if set).
+
+To clear the locally stored token:
+
+```bash
+unmold logout
+```
+
+You can also use an environment variable token:
 
 ```bash
 export UNMOLD_API_TOKEN="your_api_token_here"
 ```
 
-The CLI reads `UNMOLD_API_TOKEN` for authenticated API requests.
+`UNMOLD_API_TOKEN` takes precedence over any locally stored token.
 
 ## Quickstart
 

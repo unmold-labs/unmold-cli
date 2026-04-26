@@ -44,6 +44,7 @@ Purpose: help AI coding agents be immediately productive in this repository.
   - Follow existing error handling: bubble errors to `this.error()` in commands and rethrow (or console.error then rethrow) in util functions, matching current style.
   - When adding network endpoints, update and reuse `authenticatedRequest` and add tests that mock the same endpoints using `nock` in `tests/integration`.
   - Avoid changing the `tmp/` vendor layout or the `unmold/` subtree — these contain prebuilt artifacts and packaging outputs.
+  - Prefer using asynchronous functions and `await` over promise chains for readability, matching the existing code style.
 
 - Helpful implementation snippets (copy/paste friendly):
   - Command skeleton:
