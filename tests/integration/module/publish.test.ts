@@ -33,12 +33,17 @@ describe("publish", () => {
     // Mock the API response
     const scope = nock(`https://${config.api.host}`)
       .post("/modules/v1/unmold-test/test-mod/terraform/1.0.0")
-      .reply(200, { success: true });
+      .reply(200, { success: true })
+      .get("/users/v1/current")
+      .reply(200, {
+        name: "unmold-test",
+        email: "unmold-test@example.com",
+      });
 
     const { stdout, stderr } = await runCommand([
       "module",
       "publish",
-      "unmold-test/test-mod",
+      "test-mod",
       "1.0.0",
       "--confirm",
       "--path",
@@ -57,12 +62,17 @@ describe("publish", () => {
   it("should use default system when not provided", async () => {
     const scope = nock(`https://${config.api.host}`)
       .post("/modules/v1/unmold-test/test-mod/generic/1.0.0")
-      .reply(200, { success: true });
+      .reply(200, { success: true })
+      .get("/users/v1/current")
+      .reply(200, {
+        name: "unmold-test",
+        email: "unmold-test@example.com",
+      });
 
     const { stdout, stderr } = await runCommand([
       "module",
       "publish",
-      "unmold-test/test-mod",
+      "test-mod",
       "1.0.0",
       "--confirm",
       "--path",
@@ -113,12 +123,17 @@ describe("publish", () => {
     const scope = nock(`https://${config.api.host}`)
       .post("/modules/v1/unmold-test/test-mod/terraform/1.0.0")
       .query({ overwrite: "true" })
-      .reply(200, { success: true });
+      .reply(200, { success: true })
+      .get("/users/v1/current")
+      .reply(200, {
+        name: "unmold-test",
+        email: "unmold-test@example.com",
+      });
 
     const { stdout, stderr } = await runCommand([
       "module",
       "publish",
-      "unmold-test/test-mod",
+      "test-mod",
       "1.0.0",
       "--confirm",
       "--path",

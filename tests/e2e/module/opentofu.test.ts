@@ -38,7 +38,7 @@ describe("Opentofu", () => {
     const { stderr: publishError } = await runCommand([
       "module",
       "publish",
-      `${namespace}/test-mod-${uniqueId}`,
+      `test-mod-${uniqueId}`,
       "1.0.0",
       "--confirm",
       "--path",

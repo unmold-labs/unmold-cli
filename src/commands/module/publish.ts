@@ -10,15 +10,14 @@ export default class ModulePublish extends Command {
 
   static override examples = [
     "<%= config.bin %> <%= command.id %> mymodule 1.0.0",
-    "<%= config.bin %> <%= command.id %> myorg/mymodule 1.0.0",
-    "<%= config.bin %> <%= command.id %> myorg/mymodule 1.0.0 --system aws",
-    "<%= config.bin %> <%= command.id %> myorg/mymodule/aws 1.0.0 --path ./module-dir",
+    "<%= config.bin %> <%= command.id %> mymodule 1.0.0 --path ./module-dir",
+    "<%= config.bin %> <%= command.id %> mymodule 1.0.0 --system aws",
   ];
 
   static override args = {
-    identifiers: Args.string({
-      name: "identifiers",
-      description: "Module identifiers (namespace/name/system)",
+    name: Args.string({
+      name: "name",
+      description: "Module name (namespace is determined from your user)",
       required: true,
     }),
     version: Args.string({
@@ -58,12 +57,9 @@ export default class ModulePublish extends Command {
       const modulePath = resolve(flags.path);
       const system = flags.system;
 
-      let { namespace, name } = this.parseIdentifiers(args.identifiers);
-
-      if (!namespace) {
-        const userProfile = await getUserProfile();
-        namespace = userProfile.name;
-      }
+      const name = args.name;
+      const userProfile = await getUserProfile();
+      const namespace = userProfile.name;
 
       const metadata: IModuleMetadata = {
         namespace,
@@ -97,27 +93,5 @@ export default class ModulePublish extends Command {
         });
       }
     }
-  }
-
-  private parseIdentifiers(identifiers: string): {
-    namespace?: string;
-    name: string;
-  } {
-    const parts = identifiers.split("/");
-
-    if (parts.length === 3) {
-      const [namespace, name, system] = parts;
-      return { namespace, name };
-    } else if (parts.length === 2) {
-      const [namespace, name] = parts;
-      return { namespace, name };
-    } else if (parts.length === 1) {
-      const name = parts[0];
-      return { name };
-    }
-
-    throw new Error(
-      `Invalid module identifier format: ${identifiers}. Expected format: [namespace]/name`,
-    );
   }
 }
