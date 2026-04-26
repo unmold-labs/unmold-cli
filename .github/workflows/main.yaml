@@ -36,3 +36,9 @@ jobs:
     needs: test
     uses: ./.github/workflows/e2e.yaml
     secrets: inherit
+
+  publish-latest-image:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: test-e2e
+    uses: ./.github/workflows/publish-docker-image.yaml
+    secrets: inherit
