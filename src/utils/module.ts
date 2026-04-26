@@ -151,8 +151,12 @@ async function zipFolderToBuffer(sourceDir: string): Promise<Buffer> {
       chunks.push(Buffer.from(chunk));
     });
 
-    // Resolve when the passthrough ends
-    pass.on("end", () => {
+    // Propagate stream errors to the promise rejection
+    pass.on("error", (err: Error) => reject(err));
+
+    // Resolve when the passthrough is fully closed. Using 'close' ensures
+    // underlying file descriptors have been released by the archiver.
+    pass.on("close", () => {
       try {
         const buffer = Buffer.concat(chunks);
         resolve(buffer);
