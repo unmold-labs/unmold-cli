@@ -14,8 +14,8 @@
   "author": "",
   "main": "index.js",
   "scripts": {
-    "test:e2e": "mocha --forbid-only \"tests/e2e/**/*.test.ts\"",
-    "test:integration": "mocha --forbid-only \"tests/integration/**/*.test.ts\"",
+    "test:e2e": "npx dotenvx run -- mocha --forbid-only \"tests/e2e/**/*.test.ts\"",
+    "test:integration": "npx dotenvx run -- mocha --forbid-only \"tests/integration/**/*.test.ts\"",
     "build": "tsc",
     "oclif": "oclif",
     "set-hooks": "npx simple-git-hooks"
@@ -45,6 +45,7 @@
     "archiver": "^7.0.1"
   },
   "devDependencies": {
+    "@dotenvx/dotenvx": "^1.51.0",
     "@oclif/test": "^4.1.13",
     "@types/archiver": "^6.0.3",
     "@types/chai": "^5.2.2",

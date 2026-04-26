@@ -8,6 +8,7 @@ export default class ModulePublish extends Command {
   static override description = "Publish a new version of a module";
 
   static override examples = [
+    "<%= config.bin %> <%= command.id %> mymodule 1.0.0",
     "<%= config.bin %> <%= command.id %> myorg/mymodule 1.0.0",
     "<%= config.bin %> <%= command.id %> myorg/mymodule/aws 1.0.0 --path ./my-module",
   ];
@@ -15,7 +16,7 @@ export default class ModulePublish extends Command {
   static override args = {
     identifier: Args.string({
       name: "identifier",
-      description: "Module identifier components (namespsace/name/system)",
+      description: "Module identifiers (namespsace/name/system)",
       required: true,
     }),
     version: Args.string({

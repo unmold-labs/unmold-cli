@@ -4,7 +4,9 @@ import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
 
-import { randomSemver } from "../../test-helper";
+import { randomSemver, config } from "../../test-helper";
+
+const namespace = config.testModuleNamespace;
 
 describe("publish", () => {
   let tempDir: string;
@@ -33,7 +35,7 @@ describe("publish", () => {
     const { stdout, stderr } = await runCommand([
       "module",
       "publish",
-      "unmold-test/test-mod",
+      `${namespace}/publish-test-default-system`,
       version,
       "-y",
       "--path",
@@ -42,7 +44,7 @@ describe("publish", () => {
 
     expect(stderr).to.be.empty;
     expect(stdout).to.include(
-      `Successfully published unmold-test/test-mod/generic@${version}`,
+      `Successfully published ${namespace}/publish-test-default-system/generic@${version}`,
     );
   });
 
@@ -51,7 +53,7 @@ describe("publish", () => {
     const { stdout, stderr } = await runCommand([
       "module",
       "publish",
-      "unmold-test/test-mod/test-system",
+      `${namespace}/publish-test-custom-system/custom`,
       version,
       "-y",
       "--path",
@@ -60,7 +62,7 @@ describe("publish", () => {
 
     expect(stderr).to.be.empty;
     expect(stdout).to.include(
-      `Successfully published unmold-test/test-mod/test-system@${version}`,
+      `Successfully published ${namespace}/publish-test-custom-system/custom@${version}`,
     );
   });
 });
