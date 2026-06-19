@@ -52,7 +52,12 @@ describe("login", () => {
     callbackUrl.searchParams.set("code", "test-code");
     callbackUrl.searchParams.set("state", state);
 
-    await fetch(callbackUrl.toString());
+    const callbackResponse = await fetch(callbackUrl.toString());
+    const callbackHtml = await callbackResponse.text();
+
+    expect(callbackResponse.status).to.equal(200);
+    expect(callbackHtml).to.include("Authentication complete");
+    expect(callbackHtml).to.include("You can close this browser window");
 
     const { stdout, stderr } = await child;
 

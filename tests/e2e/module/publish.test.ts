@@ -4,15 +4,16 @@ import * as fs from "node:fs/promises";
 import * as path from "path";
 import * as os from "os";
 
-import { randomSemver, config } from "../../test-helper";
-
-const namespace = config.testModuleNamespace;
+import { randomSemver, getTestNamespace } from "../../test-helper";
 
 describe("publish", () => {
   let tempDir: string;
   let modulePath: string;
+  let namespace: string;
 
   beforeEach(async () => {
+    namespace = await getTestNamespace();
+
     // Create a temporary directory for testing
     tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "unmold-test-"));
     modulePath = path.join(tempDir, "test-module");

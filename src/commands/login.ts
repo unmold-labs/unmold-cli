@@ -8,6 +8,97 @@ import { getConfigPath, readStoredToken, saveToken } from "../utils/token";
 
 const DEFAULT_CLIENT_ID = "unmold-cli";
 const DEFAULT_TIMEOUT_SECONDS = 300;
+const CALLBACK_SUCCESS_PAGE = `<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Authentication Complete</title>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: "Geist", "Avenir Next", "Segoe UI", sans-serif;
+        background: #f9fafb;
+        color: #1f2937;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+        background:
+          radial-gradient(circle at top, rgba(255, 255, 255, 0.95), transparent 42%),
+          linear-gradient(180deg, #f9fafb 0%, #f3f4f6 100%);
+      }
+
+      main {
+        width: min(480px, 100%);
+        background: rgba(255, 255, 255, 0.96);
+        border: 1px solid #e5e7eb;
+        border-radius: 18px;
+        box-shadow: 0 24px 60px rgba(17, 24, 39, 0.08);
+        padding: 32px;
+      }
+
+      h1 {
+        margin: 0 0 12px;
+        font-size: 1.875rem;
+        line-height: 1.1;
+      }
+
+      p {
+        margin: 0;
+        font-size: 1rem;
+        line-height: 1.6;
+        color: #4b5563;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 18px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: #f3f4f6;
+        color: #374151;
+        font-size: 0.875rem;
+        font-weight: 600;
+      }
+
+      .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        background: #4ade80;
+      }
+
+      .terminal {
+        margin-top: 20px;
+        border: 1px solid #1f2937;
+        border-radius: 14px;
+        background: #111827;
+        color: #4ade80;
+        font-family: "Geist Mono", "SFMono-Regular", "Menlo", monospace;
+        font-size: 0.875rem;
+        line-height: 1.6;
+        padding: 16px 18px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="badge"><span class="dot"></span>Unmold CLI</div>
+      <h1>Authentication complete</h1>
+      <p>You can close this browser window and return to your terminal.</p>
+    </main>
+    <script>
+      window.setTimeout(() => window.close(), 5000);
+    </script>
+  </body>
+</html>`;
 
 export default class Login extends Command {
   static override description =
@@ -161,9 +252,7 @@ async function startAuthServer(state: string, timeoutSeconds: number) {
 
     res.statusCode = 200;
     res.setHeader("Content-Type", "text/html; charset=utf-8");
-    res.end(
-      "<html><body><p>Authentication complete. You can close this window.</p></body></html>",
-    );
+    res.end(CALLBACK_SUCCESS_PAGE);
     resolveCode(code);
   });
 

@@ -5,15 +5,16 @@ import * as fs from "node:fs/promises";
 import * as path from "path";
 import * as os from "os";
 
-import { config } from "../../test-helper";
-
-const namespace = config.testModuleNamespace;
+import { getTestNamespace } from "../../test-helper";
 
 describe("delete-version", () => {
   let tempDir: string;
   let modulePath: string;
+  let namespace: string;
 
   beforeEach(async () => {
+    namespace = await getTestNamespace();
+
     tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "unmold-test-"));
     modulePath = path.join(tempDir, "test-module");
 

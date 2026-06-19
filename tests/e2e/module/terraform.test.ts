@@ -7,16 +7,17 @@ import * as path from "path";
 import * as os from "os";
 import { v4 as uuid } from "uuid";
 
-import { config } from "../../test-helper";
-
-const namespace = config.testModuleNamespace;
+import { config, getTestNamespace } from "../../test-helper";
 
 describe("Terraform", () => {
   let tempDir: string;
   let modulePath: string;
   let projectPath: string;
+  let namespace: string;
 
   beforeEach(async () => {
+    namespace = await getTestNamespace();
+
     // Create a temporary directory for testing
     tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "unmold-test-"));
     modulePath = path.join(tempDir, "test-module");
