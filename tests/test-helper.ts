@@ -30,7 +30,7 @@ export const config = {
     token: process.env.UNMOLD_API_TOKEN || "test-token",
     uploadSizeLimitMB: 20,
   },
-  testModuleNamespace: "unmold-test",
+  testModuleNamespace: "unmold-test-unmold-cli-e2e",
 };
 
 /**

@@ -1,0 +1,42 @@
+# unmold CLI Documentation
+
+Version:
+
+## Overview
+
+- Primary HTML documentation: https://unmold-labs.github.io/unmold-cli/index.html
+- Root command: unmold
+- Command sections: 5
+- Maximum command depth: 2
+
+## Commands
+
+- unmold
+  URL: https://unmold-labs.github.io/unmold-cli/index.html#unmold
+  Summary: Version:
+  Usage: $ unmold [COMMAND]
+  Version: 0.1.1
+  Subcommands: module, help, login, logout
+
+- unmold module
+  URL: https://unmold-labs.github.io/unmold-cli/index.html#unmold-module
+  Summary: DESCRIPTION
+  Usage: $ unmold module
+
+- unmold help
+  URL: https://unmold-labs.github.io/unmold-cli/index.html#unmold-help
+  Summary: Version:
+  Usage: $ unmold [COMMAND]
+  Version: 0.1.1
+  Subcommands: module, help, login, logout
+
+- unmold login
+  URL: https://unmold-labs.github.io/unmold-cli/index.html#unmold-login
+  Summary: FLAGS
+  Usage: $ unmold login [--browser] [--timeout <value>]
+  Options: --[no-]browser, --timeout=<value>
+
+- unmold logout
+  URL: https://unmold-labs.github.io/unmold-cli/index.html#unmold-logout
+  Summary: DESCRIPTION
+  Usage: $ unmold logout
