@@ -1,6 +1,6 @@
 {
   "name": "@unmold/cli",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Unmold CLI for registry automation",
   "homepage": "https://github.com/unmold-cloud/unmold-cli#readme",
   "bugs": {
@@ -10,7 +10,7 @@
     "type": "git",
     "url": "git+https://github.com/unmold-cloud/unmold-cli.git"
   },
-  "license": "UNLICENSED",
+  "license": "MIT",
   "author": "",
   "main": "index.js",
   "files": [
