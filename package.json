@@ -2,13 +2,13 @@
   "name": "@unmold/cli",
   "version": "0.1.2",
   "description": "Unmold CLI for registry automation",
-  "homepage": "https://github.com/unmold-cloud/unmold-cli#readme",
+  "homepage": "https://github.com/unmold-labs/unmold-cli#readme",
   "bugs": {
-    "url": "https://github.com/unmold-cloud/unmold-cli/issues"
+    "url": "https://github.com/unmold-labs/unmold-cli/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/unmold-cloud/unmold-cli.git"
+    "url": "git+https://github.com/unmold-labs/unmold-cli.git"
   },
   "license": "MIT",
   "author": "",
