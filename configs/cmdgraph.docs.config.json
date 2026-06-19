@@ -1,0 +1,17 @@
+{
+  "format": ["html", "llms-txt", "sitemap"],
+  "output": {
+    "directory": "./docs",
+    "rootCommandName": "unmold",
+    "html": {
+      "title": "unmold-cli",
+      "projectLink": "https://github.com/unmold-labs/unmold-cli"
+    },
+    "llmsTxt": {
+      "baseUrl": "https://unmold-labs.github.io/unmold-cli/"
+    },
+    "sitemap": {
+      "baseUrl": "https://unmold-labs.github.io/unmold-cli/"
+    }
+  }
+}

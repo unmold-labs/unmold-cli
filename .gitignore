@@ -137,4 +137,8 @@ dist
 
 .DS_Store
 tmp
+<<<<<<< HEAD
+=======
+
+>>>>>>> 0ebf5fbca06c01ac1d3433663a27a293e5149541
 docs/
