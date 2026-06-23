@@ -159,6 +159,7 @@ describe("list", () => {
     const result = await runCommand(["module", "list"]);
 
     expect(result.stderr).to.equal("");
+    console.log(result.stdout);
     expect(JSON.parse(result.stdout)).to.deep.equal([
       {
         namespace: "unmold-test",
