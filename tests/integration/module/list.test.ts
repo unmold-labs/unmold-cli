@@ -141,6 +141,9 @@ describe("list", () => {
   });
 
   it("should list modules without filters", async () => {
+    delete process.env.UNMOLD_API_TOKEN;
+    process.env.UNMOLD_CONFIG_PATH = "/tmp/unmold-cli-no-token-config.json";
+
     const scope = nock(`https://${config.api.host}`)
       .get("/modules/v1")
       .reply(200, [
@@ -159,25 +162,23 @@ describe("list", () => {
     expect(result.stderr).to.equal("");
 
     const trimmed = result.stdout.trim();
-    if (trimmed.length > 0) {
-      const lines = trimmed.split("\n");
-      const hasAnonymousIndicator =
-        lines[0] ===
-        "No authentication token found. Showing public modules only.";
-      const jsonText = hasAnonymousIndicator
-        ? lines.slice(1).join("\n")
-        : trimmed;
+    const lines = trimmed.split("\n");
+    const hasAnonymousIndicator =
+      lines[0] ===
+      "No authentication token found. Showing public modules only.";
+    const jsonText = hasAnonymousIndicator
+      ? lines.slice(1).join("\n")
+      : trimmed;
 
-      expect(JSON.parse(jsonText)).to.deep.equal([
-        {
-          namespace: "unmold-test",
-          name: "test-mod",
-          system: "generic",
-          version: "1.0.0",
-          access: "public",
-        },
-      ]);
-    }
+    expect(JSON.parse(jsonText)).to.deep.equal([
+      {
+        namespace: "unmold-test",
+        name: "test-mod",
+        system: "generic",
+        version: "1.0.0",
+        access: "public",
+      },
+    ]);
 
     scope.done();
   });

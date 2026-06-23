@@ -1,23 +1,16 @@
 import { unmold } from "./config";
 import { readStoredToken } from "./token";
 
-let cachedToken: string | null = null;
-
 async function getAuthToken(): Promise<string> {
   if (process.env.UNMOLD_API_TOKEN) {
     return process.env.UNMOLD_API_TOKEN;
   }
 
-  if (cachedToken !== null) {
-    return cachedToken;
-  }
-
-  cachedToken = await readStoredToken();
-  return cachedToken;
+  return await readStoredToken();
 }
 
 export function resetAuthTokenCache(): void {
-  cachedToken = null;
+  // Kept for compatibility; token reads are no longer cached.
 }
 
 export async function checkAuth(): Promise<string> {
