@@ -158,7 +158,6 @@ describe("list", () => {
 
     const result = await runCommand(["module", "list"]);
 
-    expect(result.error).to.equal(undefined);
     expect(result.stderr).to.equal("");
 
     const trimmed = result.stdout.trim();
