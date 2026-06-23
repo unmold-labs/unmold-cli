@@ -97,6 +97,7 @@ describe("list", () => {
         name: moduleName,
         system: "generic",
         version: "1.0.0",
+        access: "private",
       },
     ]);
   });
@@ -138,6 +139,7 @@ describe("list", () => {
         name: moduleName,
         system: "aws",
         version: "1.0.0",
+        access: "private",
       },
     ]);
   });
