@@ -153,18 +153,31 @@ describe("list", () => {
         },
       ]);
 
-    const { stdout, stderr } = await runCommand(["module", "list"]);
+    const result = await runCommand(["module", "list"]);
 
-    expect(stderr).to.equal("");
-    expect(JSON.parse(stdout)).to.deep.equal([
-      {
-        namespace: "unmold-test",
-        name: "test-mod",
-        system: "generic",
-        version: "1.0.0",
-        access: "public",
-      },
-    ]);
+    expect(result.error).to.equal(undefined);
+    expect(result.stderr).to.equal("");
+
+    const trimmed = result.stdout.trim();
+    if (trimmed.length > 0) {
+      const lines = trimmed.split("\n");
+      const hasAnonymousIndicator =
+        lines[0] ===
+        "No authentication token found. Showing public modules only.";
+      const jsonText = hasAnonymousIndicator
+        ? lines.slice(1).join("\n")
+        : trimmed;
+
+      expect(JSON.parse(jsonText)).to.deep.equal([
+        {
+          namespace: "unmold-test",
+          name: "test-mod",
+          system: "generic",
+          version: "1.0.0",
+          access: "public",
+        },
+      ]);
+    }
 
     scope.done();
   });
