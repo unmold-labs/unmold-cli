@@ -1,6 +1,6 @@
 {
   "name": "@unmold/cli",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "Unmold CLI for registry automation",
   "homepage": "https://github.com/unmold-labs/unmold-cli#readme",
   "bugs": {
