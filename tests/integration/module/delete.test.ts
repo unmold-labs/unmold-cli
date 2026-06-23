@@ -2,7 +2,7 @@ import { runCommand } from "@oclif/test";
 import { expect } from "chai";
 import nock from "nock";
 
-import { config } from "../../test-helper";
+import { config } from "../../test-helper.ts";
 
 describe("delete", () => {
   it("should delete all module versions successfully", async () => {

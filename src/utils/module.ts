@@ -3,8 +3,13 @@ import { join } from "node:path";
 import ignore from "ignore";
 import JSZip from "jszip";
 
-import { authenticatedRequest } from "../utils/index";
+import {
+  authenticatedRequest,
+  optionalAuthenticatedRequest,
+} from "../utils/index";
 import { unmold } from "../utils/config";
+
+export type ModuleAccess = "private" | "public";
 
 export interface IModuleMetadata {
   /**
@@ -23,6 +28,10 @@ export interface IModuleMetadata {
    * The target system for which the module is intended.
    */
   system: string;
+  /**
+   * Visibility for this module version.
+   */
+  access?: ModuleAccess;
 }
 
 export interface IDeletedModule {
@@ -39,23 +48,19 @@ export interface IModuleDeleteTarget {
 }
 
 export async function list(filters: {
-  namespace: string;
+  namespace?: string;
   name?: string;
   system?: string;
-}): Promise<IModuleMetadata[]> {
+}): Promise<{ modules: IModuleMetadata[]; isAnonymous: boolean }> {
   const { namespace, name, system } = filters;
 
-  let path = `${namespace}`;
+  const pathSegments = [namespace, name, system].filter(
+    (segment): segment is string => !!segment,
+  );
+  const path = pathSegments.length > 0 ? `/${pathSegments.join("/")}` : "";
 
-  if (name) {
-    path += `/${name}`;
-  }
-
-  if (system) {
-    path += `/${system}`;
-  }
-
-  const result = await authenticatedRequest(`/modules/v1/${path}`);
+  const { response: result, isAuthenticated } =
+    await optionalAuthenticatedRequest(`/modules/v1${path}`);
 
   if (!result.ok) {
     throw new Error(`Failed to list module versions: ${result.statusText}`);
@@ -63,12 +68,16 @@ export async function list(filters: {
 
   const results: any = await result.json();
 
-  return results.map((data: any) => ({
-    namespace: data.namespace,
-    name: data.name,
-    system: data.system,
-    version: data.version,
-  }));
+  return {
+    isAnonymous: !isAuthenticated,
+    modules: results.map((data: any) => ({
+      namespace: data.namespace,
+      name: data.name,
+      system: data.system,
+      version: data.version,
+      access: data.access,
+    })),
+  };
 }
 
 export async function publish(
@@ -76,7 +85,13 @@ export async function publish(
   metadata: IModuleMetadata,
   overwrite = false,
 ) {
-  const { namespace, name, version, system } = metadata;
+  const {
+    namespace,
+    name,
+    version,
+    system,
+    access: moduleAccess = "private",
+  } = metadata;
   const MAX_MODULE_SIZE = unmold.api.uploadSizeLimitMB * 1024 * 1024; // 20MB in bytes
 
   try {
@@ -100,11 +115,11 @@ export async function publish(
       );
     }
 
-    let url = `/modules/v1/${namespace}/${name}/${system}/${version}`;
-
+    const params = new URLSearchParams({ access: moduleAccess });
     if (overwrite) {
-      url += "?overwrite=true";
+      params.set("overwrite", "true");
     }
+    const url = `/modules/v1/${namespace}/${name}/${system}/${version}?${params.toString()}`;
 
     const result = await authenticatedRequest(url, {
       method: "POST",
@@ -174,6 +189,36 @@ export async function deleteModule(target: IModuleDeleteTarget): Promise<{
   }
 
   return await result.json();
+}
+
+export async function updateModuleAccess(
+  metadata: IModuleMetadata & { access: ModuleAccess },
+): Promise<{ message?: string }> {
+  const { namespace, name, version, system, access } = metadata;
+
+  if (!isValidVersion(version)) {
+    throw new Error(`Invalid version name: ${version}`);
+  }
+
+  const result = await authenticatedRequest(
+    `/modules/v1/${namespace}/${name}/${system}/${version}`,
+    {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ access }),
+    },
+  );
+
+  if (!result.ok) {
+    const errorData = await result.json().catch(() => ({}));
+    throw new Error(
+      `Failed to update module access: ${result.status} ${result.statusText} - ${JSON.stringify(errorData)}`,
+    );
+  }
+
+  return await result.json().catch(() => ({}));
 }
 
 /**

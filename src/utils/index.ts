@@ -16,6 +16,10 @@ async function getAuthToken(): Promise<string> {
   return cachedToken;
 }
 
+export function resetAuthTokenCache(): void {
+  cachedToken = null;
+}
+
 export async function checkAuth(): Promise<string> {
   const token = await getAuthToken();
   if (!token) {
@@ -39,4 +43,25 @@ export async function authenticatedRequest(
   };
 
   return fetch(`${unmold.api.url}${path}`, { ...options, headers });
+}
+
+export async function optionalAuthenticatedRequest(
+  path: string,
+  options: RequestInit = {},
+): Promise<{ response: Response; isAuthenticated: boolean }> {
+  const token = await getAuthToken();
+  const headers = {
+    ...options.headers,
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
+
+  const response = await fetch(`${unmold.api.url}${path}`, {
+    ...options,
+    headers,
+  });
+
+  return {
+    response,
+    isAuthenticated: !!token,
+  };
 }

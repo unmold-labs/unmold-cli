@@ -1,7 +1,6 @@
 // test/test-helper.ts
 import { TextEncoder, TextDecoder } from "util";
 import fetch, { Response } from "node-fetch";
-import { getUserProfile } from "../src/utils/auth";
 
 // Set up global fetch
 global.fetch = fetch as any;
@@ -48,8 +47,23 @@ export async function getTestNamespace(): Promise<string> {
   }
 
   try {
-    const profile = await getUserProfile();
-    resolvedNamespace = profile.name;
+    const token = process.env.UNMOLD_API_TOKEN;
+    if (!token) {
+      throw new Error("Missing UNMOLD_API_TOKEN");
+    }
+
+    const response = await fetch("https://api.unmold.dev/users/v1/current", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch profile: ${response.status}`);
+    }
+
+    const profile = (await response.json()) as { name?: string };
+    resolvedNamespace = profile.name || config.testModuleNamespace;
     return resolvedNamespace;
   } catch (_error) {
     // Keep compatibility for environments without live auth context.

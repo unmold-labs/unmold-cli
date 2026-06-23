@@ -12,6 +12,7 @@ export default class ModulePublish extends Command {
     "<%= config.bin %> <%= command.id %> mymodule 1.0.0",
     "<%= config.bin %> <%= command.id %> mymodule 1.0.0 --path ./module-dir",
     "<%= config.bin %> <%= command.id %> mymodule 1.0.0 --system aws",
+    "<%= config.bin %> <%= command.id %> mymodule 1.0.0 --access public",
   ];
 
   static override args = {
@@ -43,6 +44,12 @@ export default class ModulePublish extends Command {
       description: "Overwrite existing module version if present",
       default: false,
     }),
+    access: Flags.string({
+      char: "a",
+      description: "Access level for the module version",
+      options: ["private", "public"],
+      default: "private",
+    }),
     confirm: Flags.boolean({
       char: "c",
       description: "Confirm the publication",
@@ -52,6 +59,13 @@ export default class ModulePublish extends Command {
 
   public async run(): Promise<void> {
     const { args, flags } = await this.parse(ModulePublish);
+    const access = flags.access as string;
+
+    if (access !== "private" && access !== "public") {
+      this.error("Invalid access value. Allowed values: private, public", {
+        exit: 1,
+      });
+    }
 
     try {
       const modulePath = resolve(flags.path);
@@ -66,6 +80,7 @@ export default class ModulePublish extends Command {
         name,
         system,
         version: args.version,
+        access: access as "private" | "public",
       };
 
       if (!flags.confirm) {
